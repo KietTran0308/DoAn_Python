@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+
+.reusable-table-container {
+    flex-grow: 1;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table tr {
+    height: 60px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.data-table td{
+    font: normal 20px 'Open Sans', sans-serif;
+}
+
+.data-table th {
+    background-color: #262532;
+    color: white;
+    font-weight: normal;
+    font: italic 20px 'Merriweather', serif;
+    height: 2vh;
+}
+
+.data-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #edf5ff;
+}

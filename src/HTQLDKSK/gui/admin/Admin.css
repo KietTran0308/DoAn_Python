@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap');
+
+/* Reset cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.admin {
+    gap: 3px;
+    display: flex;
+    height: 100vh;
+    background-color: white;
+}
+
+/* Sidebar (Div 2) */
+.sidebar {
+    width: 300px;
+    background: linear-gradient(135deg, #100F1A 0%, #161524 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font: bold 40px 'Space Grotesk', sans-serif;
+    padding: 10px;
+    text-align: center;
+    background: linear-gradient(to right, #edf8ff, #7CCDFF);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.thanh{
+    background-color: white;
+    height: 1px;
+    margin: 0px 10px 25px 10px;
+}
+
+.nav-menu {
+    flex-grow: 1;
+}
+.nav-menu li {
+    padding: 15px 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font: 600 23px 'Source Serif Pro', sans-serif;
+}
+
+.nav-menu li.active {
+    background-color: #6a95b8; /* Màu xanh biển nhạt */
+}
+
+.logout {
+    padding: 20px;
+    border-top: 1px solid #333;
+    cursor: pointer;
+}
+
+/* Main Container (Div 3) */
+.main-container {
+    gap: 3px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+/* Tabs (Div 3.1) */
+.top-tabs {
+    background-color: #11101C;
+    color: rgb(255 255 255 / 0.57);
+    display: flex;
+    gap: 60px;
+    border-radius: 0px 0px 0px 10px;
+    height: 6vh;
+    padding: 15px;
+}
+
+.tab {
+    font: 600 23px 'Source Serif Pro', sans-serif;
+    cursor: pointer;
+}
+
+.active-tab {
+    color: white;
+    border-bottom: 3px solid #80ceff;
+}
+
+/* Vùng Nội Dung (Div 3.2) */
+.content-area {
+    background-color: #262532;
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px 0px 0px 0px;
+}
+
+/* Toolbar */
+.toolbar {
+    display: flex;
+    justify-content: space-between; /* Đẩy tb-left và tb-right ra 2 mép */
+    align-items: center; /* Căn giữa các phần tử theo chiều dọc */
+    margin-bottom: 20px;
+}
+
+.tb-left {
+    display: flex;
+    gap: 10px;
+    flex-grow: 1;
+    margin-right: 20px;
+    height: 4vh;
+}
+
+.tb-right {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar input {
+    width: 25vw;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: normal 18px 'Merriweather', sans-serif;
+}
+
+.toolbar select {
+    width: 10vw;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font: normal 18px 'Merriweather', sans-serif;
+}
+
+.add-btn {
+    padding: 8px 15px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font: bold 18px 'Merriweather', sans-serif;
+    height: 4vh;
+}
+
+
+/* Phân trang */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination span {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 3px;
+    background-color: white;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.pagination .active {
+    background-color: #e0e0e0;
+}
