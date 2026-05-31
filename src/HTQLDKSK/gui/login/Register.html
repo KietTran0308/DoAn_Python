@@ -4,9 +4,10 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>NOVAENTRY - Đăng nhập vào Vũ trụ Trải nghiệm</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&amp;family=Hanken+Grotesk:wght@400;600&amp;family=Be+Vietnam+Pro:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600&amp;family=Space+Grotesk:wght@500;700&amp;display=swap"
+          rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
           rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
           rel="stylesheet"/>
@@ -146,101 +147,89 @@
                 <p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Digital
                     Experience Nebula</p>
             </div>
-            <!-- Form Section -->
-            <div class="space-y-8">
-                <div class="space-y-2">
-                    <h1 class="font-headline-md text-headline-md">Chào mừng trở lại</h1>
-                    <p class="font-body-md text-on-surface-variant">Nhập thông tin tài khoản để tiếp tục hành trình của
-                        bạn.</p>
+            <!-- Registration Form -->
+            <form class="space-y-6">
+                <div class="space-y-4">
+                    <!-- Full Name -->
+                    <div class="group">
+                        <label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2"
+                               for="name">Họ và tên</label>
+                        <div class="relative input-glow transition-all duration-300">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 font-body-md text-body-md text-white focus:ring-0 focus:border-tertiary transition-all placeholder:text-surface-variant"
+                                   id="name" placeholder="Nguyễn Văn A" type="text"/>
+                        </div>
+                    </div>
+                    <!-- Email -->
+                    <div class="group">
+                        <label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2"
+                               for="email">Email</label>
+                        <div class="relative input-glow transition-all duration-300">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 font-body-md text-body-md text-white focus:ring-0 focus:border-tertiary transition-all placeholder:text-surface-variant"
+                                   id="email" placeholder="nova@entry.vn" type="email"/>
+                        </div>
+                    </div>
+                    <!-- Phone -->
+                    <div class="group">
+                        <label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2"
+                               for="phone">Số điện thoại</label>
+                        <div class="relative input-glow transition-all duration-300">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 font-body-md text-body-md text-white focus:ring-0 focus:border-tertiary transition-all placeholder:text-surface-variant"
+                                   id="phone" placeholder="0901 234 567" type="tel"/>
+                        </div>
+                    </div>
+                    <!-- Password -->
+                    <div class="group">
+                        <label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2"
+                               for="password">Mật khẩu</label>
+                        <div class="relative input-glow transition-all duration-300">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 font-body-md text-body-md text-white focus:ring-0 focus:border-tertiary transition-all placeholder:text-surface-variant"
+                                   id="password" placeholder="••••••••" type="password"/>
+                        </div>
+                    </div>
+                    <!-- Confirm Password -->
+                    <div class="group">
+                        <label class="block font-label-md text-label-md text-on-surface-variant uppercase mb-2"
+                               for="confirm-password">Xác nhận mật khẩu</label>
+                        <div class="relative input-glow transition-all duration-300">
+                            <input class="w-full bg-transparent border-0 border-b border-outline-variant py-3 font-body-md text-body-md text-white focus:ring-0 focus:border-tertiary transition-all placeholder:text-surface-variant"
+                                   id="confirm-password" placeholder="••••••••" type="password"/>
+                        </div>
+                    </div>
                 </div>
-                <form action="#" class="space-y-6">
-                    <div class="space-y-4">
-                        <!-- Email Input -->
-                        <div class="relative group">
-                            <label class="font-label-md text-label-md text-on-surface-variant mb-2 block group-focus-within:text-primary transition-colors"
-                                   for="email">EMAIL HOẶC TÀI KHOẢN</label>
-                            <div class="flex items-center border-b border-outline-variant focus-within:border-primary transition-all duration-300">
-                                <span class="material-symbols-outlined text-outline group-focus-within:text-primary mr-3">alternate_email</span>
-                                <input class="bg-transparent border-none w-full py-4 text-body-md focus:ring-0 placeholder:text-outline/40"
-                                       id="email" placeholder="example@nova.vn" type="email"/>
-                            </div>
-                        </div>
-                        <!-- Password Input -->
-                        <div class="relative group">
-                            <div class="flex justify-between items-end mb-2">
-                                <label class="font-label-md text-label-md text-on-surface-variant group-focus-within:text-primary transition-colors"
-                                       for="password">MẬT KHẨU</label>
-                                <a class="font-label-md text-label-md text-primary hover:text-secondary transition-colors underline-offset-4 hover:underline"
-                                   href="#">Quên mật khẩu?</a>
-                            </div>
-                            <div class="flex items-center border-b border-outline-variant focus-within:border-primary transition-all duration-300">
-                                <span class="material-symbols-outlined text-outline group-focus-within:text-primary mr-3">lock_open</span>
-                                <input class="bg-transparent border-none w-full py-4 text-body-md focus:ring-0 placeholder:text-outline/40"
-                                       id="password" placeholder="••••••••" type="password"/>
-                                <span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface transition-colors">visibility_off</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <input class="w-4 h-4 rounded-sm border-outline bg-transparent text-primary focus:ring-primary focus:ring-offset-background"
-                               id="remember" type="checkbox"/>
-                        <label class="font-label-md text-label-md text-on-surface-variant cursor-pointer"
-                               for="remember">Ghi nhớ đăng nhập</label>
-                    </div>
-                    <!-- CTA Button -->
-                    <button class="w-full bg-gradient-to-r from-primary to-secondary text-on-primary font-label-md text-label-md py-5 rounded-lg shadow-[0_0_20px_rgba(195,192,255,0.2)] hover:shadow-[0_0_30px_rgba(195,192,255,0.4)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
+                <!-- Terms checkbox -->
+                <div class="flex items-center gap-3 py-2">
+                    <input class="w-5 h-5 rounded border-outline-variant bg-transparent text-primary focus:ring-primary/20"
+                           id="terms" type="checkbox"/>
+                    <label class="font-body-md text-on-surface-variant text-sm" for="terms">
+                        Tôi đồng ý với <span
+                            class="text-tertiary cursor-pointer hover:underline">Điều khoản dịch vụ</span> và <span
+                            class="text-tertiary cursor-pointer hover:underline">Chính sách bảo mật</span>.
+                    </label>
+                </div>
+                <!-- Action Button -->
+                <div class="pt-4">
+                    <button class="w-full py-4 rounded-lg bg-gradient-to-r from-[#E6F5FF] to-[#7CCDFF] text-[#000] font-label-md text-label-md tracking-widest hover:brightness-110 hover:shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all duration-300 uppercase"
                             type="submit">
-                        ĐĂNG NHẬP NGAY
+                        ĐĂNG KÝ
                     </button>
-                    <!-- Social Login -->
-                    <div class="relative py-4">
-                        <div class="absolute inset-0 flex items-center">
-                            <div class="w-full border-t border-white/5"></div>
-                        </div>
-                        <div class="relative flex justify-center text-xs uppercase"><span
-                                class="bg-background px-4 text-outline font-label-md">Hoặc tiếp tục với</span></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button class="flex items-center justify-center gap-2 border border-outline-variant py-3 rounded-lg hover:bg-white/5 transition-colors group"
-                                type="button">
-                            <img alt="Google" class="w-5 h-5"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-qIbbJEce6Uv80md8FnzfRSHqWY0Po2YMV6SSR97xGrLEvPHmNVEA_HWhg2EUvYvMboZgdSSElBp3YkG0pTspcFgYAIwNMFXlnAJz-mvdY4Tfx48DsutYnwq3t2KVIM2K5BHTYDziFJLXKzhBzJf0ukJ6QmQFs9pRqolbo0kMo67ZGoomH5BN_-0Ms2ua_3bHZzPMDdxuXa7XrzDmjV-BxBTKjIvJ0q7InZOZzKMvYcalGESfnXy_DMFvDNhcPwlAp97Smlu3-GWM"/>
-                            <span class="font-label-md text-on-surface-variant group-hover:text-on-surface">Google</span>
-                        </button>
-                        <button class="flex items-center justify-center gap-2 border border-outline-variant py-3 rounded-lg hover:bg-white/5 transition-colors group"
-                                type="button">
-                            <img alt="Facebook" class="w-5 h-5"
-                                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDihTxcTpJzLf_7ZNT8Fxni3dJBTn8P__D2qVtE846G_Mu81CUdL34MwB5hN18WBap0N9LSzEJVMGAhboSRHv2fsbmLU7naJRIOlqyqK_ThKAgFZxtRFaokxvp9f5OIZRsPcfZT9sXtQZlfdCiEYCyX7la8bKHfdrAXfdgzKloZwSCGdKFN5elhKfBbWm1Rp25wDVUNnmHQFG6poxC1kpj8HtRwjbFUTtL-YW_hERr6sYMy4pLdqxS8uJcwJPJuJTcJh0lI7CwCzFS"/>
-                            <span class="font-label-md text-on-surface-variant group-hover:text-on-surface">Facebook</span>
-                        </button>
-                    </div>
-                </form>
-                <p class="text-center font-body-md text-on-surface-variant">
-                    Bạn mới biết đến NovaEntry?
-                    <a class="text-primary font-bold hover:text-secondary transition-colors underline-offset-4 hover:underline ml-1"
-                       href="#">Tạo tài khoản mới</a>
+                </div>
+                <!-- Navigation -->
+                <div class="text-center pt-8">
+                    <p class="font-body-md text-on-surface-variant">
+                        Đã có tài khoản?
+                        <a class="ml-1 text-tertiary font-bold hover:text-tertiary-fixed transition-colors" href="#">Đăng
+                            nhập ngay</a>
+                    </p>
+                </div>
+            </form>
+            <!-- Footer Disclaimer -->
+            <div class="mt-24 text-center">
+                <p class="text-surface-variant font-label-md text-[10px] uppercase tracking-[0.2em]">
+                    © 2024 NOVAENTRY • SECURED CONNECTION
                 </p>
             </div>
-            <!-- Footer Links (Simplified) -->
-            <div class="flex justify-center gap-6 pt-12">
-                <a class="font-label-md text-label-md text-outline hover:text-on-surface transition-colors" href="#">Điều
-                    khoản</a>
-                <a class="font-label-md text-label-md text-outline hover:text-on-surface transition-colors" href="#">Bảo
-                    mật</a>
-                <a class="font-label-md text-label-md text-outline hover:text-on-surface transition-colors" href="#">Trợ
-                    giúp</a>
-            </div>
         </div>
-        <!-- Background Atmosphere -->
-        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[120px] -z-10"></div>
-        <div class="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-[150px] -z-10"></div>
     </section>
 </main>
-<!-- Side Decoration (Fixed Right) -->
-<div class="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-8 items-center hidden xl:flex">
-    <div class="h-24 w-[1px] bg-gradient-to-b from-transparent via-outline-variant to-transparent"></div>
-    <span class="font-label-md text-label-md text-outline [writing-mode:vertical-lr] rotate-180 uppercase tracking-widest opacity-40">NovaEntry v2.4</span>
-    <div class="h-24 w-[1px] bg-gradient-to-b from-transparent via-outline-variant to-transparent"></div>
-</div>
 </body>
 </html>
