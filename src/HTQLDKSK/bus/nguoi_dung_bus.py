@@ -37,3 +37,58 @@ class NguoiDungBUS:
                 "ho_ten": f"{thong_tin_ca_nhan['HO']} {thong_tin_ca_nhan['TEN']}"
             }
         }
+    
+    # Bổ sung def xử lý đăng ký
+    def xu_ly_dang_ky(
+        self,
+        username,
+        password,
+        ho,
+        ten,
+        email,
+        sdt
+    ):
+
+    # kiểm tra username
+    tai_khoan = self.dao.get_tai_khoan_by_username(username)
+
+    if tai_khoan:
+        return {
+            "success": False,
+            "message": "Tên đăng nhập đã tồn tại"
+        }
+
+    # kiểm tra email
+    nguoi_dung = self.dao.get_nguoi_dung_by_email(email)
+
+    if nguoi_dung:
+        return {
+            "success": False,
+            "message": "Email đã được sử dụng"
+        }
+
+    # tạo tài khoản
+    ma_tk = self.dao.create_tai_khoan(
+        username,
+        password
+    )
+
+    if not ma_tk:
+        return {
+            "success": False,
+            "message": "Đăng ký thất bại"
+        }
+
+    # tạo thông tin người dùng
+    self.dao.create_nguoi_dung(
+        ma_tk,
+        ho,
+        ten,
+        email,
+        sdt
+    )
+
+    return {
+        "success": True,
+        "message": "Đăng ký thành công"
+    }
