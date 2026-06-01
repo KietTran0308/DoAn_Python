@@ -2,7 +2,21 @@ class SuKienDAO:
     def __init__(self, db_connection):
         self.db = db_connection
 
-    def get_chi_tiet_su_kien(self, ma_sk):
+    def lay_tat_ca_su_kien():
+        # Giả lập kết nối DB
+        conn = mysql.connector.connect(host="localhost", user="root", database="hethongsukien")
+        cursor = conn.cursor(dictionary=True)  # dictionary=True giúp trả về dạng Key-Value
+
+        sql = "SELECT MA_SK, TEN_SK, TG_BAT_DAU, TRANG_THAI FROM su_kien"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return data
+
+    def getChiTietSK(self, ma_sk):
         cursor = self.db.cursor(dictionary=True)
         query = """
             SELECT sk.*, dm.TEN_DM, dd.TEN_DD, dd.DIA_CHI

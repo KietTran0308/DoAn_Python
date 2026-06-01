@@ -13,11 +13,7 @@
             <div class="logo">NOVA ENTRY</div>
             <div class="thanh"></div>
             <ul class="nav-menu">
-                <li class="active">Sự kiện</li>
-                <li>Khách hàng & đơn hàng</li>
-                <li>Tài khoản</li>
-                <li>Báo cáo, thống kê</li>
-                <li>Soát vé</li>
+
             </ul>
             <div class="logout">
                 <span>Đăng xuất</span>
@@ -26,10 +22,6 @@
 
         <div class="main-container">
             <div class="top-tabs">
-                <div class="tab active-tab">Danh sách sự kiện</div>
-                <div class="tab">Địa điểm</div>
-                <div class="tab">Danh mục sự kiện</div>
-                <div class="tab">Nghệ sĩ</div>
             </div>
 
             <div class="content-area">
@@ -53,20 +45,6 @@
         </div>
     </div>
 
-    <script>
-        // Gọi file TableComponent.html
-        fetch('../TableComponent.html')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Lỗi không tải được component bảng');
-                }
-                return response.text();
-            })
-            .then(data => {
-                // Nhét nội dung HTML lấy được vào div chờ
-                document.getElementById('table-placeholder').innerHTML = data;
-            })
-            .catch(error => console.error('Lỗi:', error));
-    </script>
+    <script src="Admin.js" defer></script>
 </body>
 </html>
