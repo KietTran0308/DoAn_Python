@@ -5,43 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Ticket Management System - Web Layout</title>
     <link rel="stylesheet" href="Admin.css">
-    <link rel="stylesheet" href="../TableComponent.css">
+    <link rel="stylesheet" href="TableComponent.css">
 </head>
 <body>
     <div class="admin">
         <div class="sidebar">
             <div class="logo">NOVA ENTRY</div>
             <div class="thanh"></div>
-            <ul class="nav-menu">
+            <ul class="nav-menu"></ul>
 
-            </ul>
-            <div class="logout">
-                <span>Đăng xuất</span>
+            <div class="sidebar-clock">
+                <div id="clock-time">00:00:00</div>
+                <div id="clock-date">Thứ..., --/--/----</div>
             </div>
         </div>
 
         <div class="main-container">
-            <div class="top-tabs">
-            </div>
-
-            <div class="content-area">
-                <div class="toolbar">
-                    <div class="tb-left">
-                         <input type="text" placeholder="Tìm theo mã, tên, số điện thoại...">
-                        <select><option>Tất cả danh mục</option></select>
-                        <select><option>Tất cả trạng thái</option></select>
-                    </div>
-                    <div class="tb-right">
-                        <button class="add-btn">+ Thêm SK</button>
-                    </div>
-                </div>
-
-                <div id="table-placeholder"></div>
-
-                <div class="pagination">
-                    <span>&lt;</span> <span class="active">1</span> <span>2</span> <span>3</span> ... <span>5</span> <span>&gt;</span>
-                </div>
-            </div>
+            <div class="top-tabs"> </div>
+            <div id="content-area"> </div>
         </div>
     </div>
 

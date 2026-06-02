@@ -4,17 +4,14 @@
 .reusable-table-container {
     flex-grow: 1;
     background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .data-table {
     width: 100%;
     border-collapse: collapse;
-}
-
-.data-table tr {
-    height: 60px;
 }
 
 .data-table th, .data-table td {
@@ -31,13 +28,26 @@
     color: white;
     font-weight: normal;
     font: italic 20px 'Merriweather', serif;
-    height: 2vh;
+    padding: 12px 15px;
 }
 
-.data-table tbody tr:nth-child(odd) {
-    background-color: #ffffff;
+.data-table tbody tr:nth-child(odd) { background-color: #ffffff; }
+
+.data-table tbody tr:nth-child(even) { background-color: #edf5ff; }
+
+.data-table .actions {
+    text-align: center; /* Căn giữa các icon */
 }
 
-.data-table tbody tr:nth-child(even) {
-    background-color: #edf5ff;
+.action-icon {
+    width: 35px;
+    height: 35px;
+    margin: 0 5px;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+.action-icon:hover {
+    transform: scale(1.2);
 }

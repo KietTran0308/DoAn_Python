@@ -5,14 +5,15 @@ class SuKienBUS:
         self.dao = SuKienDAO(db_connection)
 
     def lay_danh_sach_hien_thi(self):
-        data = SuKienDAO.lay_tat_ca_su_kien()
+        data = self.dao.lay_tat_ca_su_kien()
 
-        # Xử lý nghiệp vụ: Đổi format dữ liệu trước khi gửi đi
         for sk in data:
-            if sk['TRANG_THAI'] == 1:
-                sk['TRANG_THAI_TEXT'] = "🟢 Hoạt động"
-            else:
-                sk['TRANG_THAI_TEXT'] = "🔴 Đã khóa"
+            if 'TG_BAT_DAU' in sk and sk['TG_BAT_DAU']:
+                sk['TG_BAT_DAU'] = sk['TG_BAT_DAU'].strftime('%Y-%m-%d %H:%M:%S')
+
+            # 2. Xử lý trạng thái (Giữ nguyên như bạn đã làm)
+            if sk['TRANG_THAI'] == 1: sk['TRANG_THAI_TEXT'] = "🟢 Hoạt động"
+            else: sk['TRANG_THAI_TEXT'] = "🔴 Đã khóa"
 
         return data
 
