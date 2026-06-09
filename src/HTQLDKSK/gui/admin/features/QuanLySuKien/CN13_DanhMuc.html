@@ -1,0 +1,51 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <input type="text" placeholder="Tìm theo tên danh mục...">
+    </div>
+    <div class="tb-right">
+        <button class="add-btn" id="btn-open-add-category">+ Thêm Danh Mục</button>
+    </div>
+</div>
+
+<div class="reusable-table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th class="col-id">Mã DM</th>
+            <th style="width: 120px; text-align: center;">Hình Ảnh</th>
+            <th>Tên danh mục</th>
+            <th style="width: 200px; text-align: center;">Số lượng sự kiện</th>
+            <th class="col-actions">Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="category-table-body">
+            </tbody>
+    </table>
+</div>
+
+<div class="pagination" id="category-pagination"></div>
+
+<div id="category-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 id="category-modal-title">Thêm Danh Mục</h2>
+            <span class="close-modal-btn" id="close-category-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label>Tên danh mục <span class="required">*</span></label>
+                    <input type="text" id="TEN_DM" required placeholder="VD: Âm nhạc">
+                </div>
+                <div class="form-group">
+                    <label>Link hình ảnh (URL)</label>
+                    <input type="text" id="IMAGE_URL" placeholder="VD: https://link-anh.com/music.jpg">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancel-category-btn">Hủy bỏ</button>
+            <button type="button" class="btn-save" id="save-category-btn">Lưu</button>
+        </div>
+    </div>
+</div>

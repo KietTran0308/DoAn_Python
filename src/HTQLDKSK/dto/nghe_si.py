@@ -36,3 +36,11 @@ class NgheSi:
     @image_url.setter
     def image_url(self, value):
         self._image_url = value
+
+    def to_dict(self):
+        return {
+            "MA_NS": self._ma_ns,
+            "TEN_NS": self._ten_ns,
+            "TIEU_SU": self._tieu_su,
+            "IMAGE_URL": self._image_url
+        }

@@ -1,0 +1,186 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <input type="text" placeholder="Tìm theo mã, tên, số điện thoại...">
+        <select>
+            <option>Tất cả danh mục</option>
+        </select>
+        <select>
+            <option>Tất cả trạng thái</option>
+        </select>
+    </div>
+    <div class="tb-right">
+        <button class="add-btn">+ Thêm SK</button>
+    </div>
+</div>
+
+<div class="reusable-table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Tên sự kiện</th>
+            <th>Ngày tổ chức</th>
+            <th>Địa điểm</th>
+            <th>Vé đã bán</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th> </tr>
+        </tr>
+        </thead>
+        <tbody id="event-table-body">
+        </tbody>
+    </table>
+</div>
+
+<div id="add-event-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Thêm Sự Kiện Mới</h2>
+            <span class="close-modal-btn" id="close-add-modal">&times;</span>
+        </div>
+
+        <div class="modal-body">
+            <form id="addEventForm">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="TEN_SK">Tên sự kiện <span class="required">*</span></label>
+                        <input type="text" id="TEN_SK" name="TEN_SK" placeholder="VD: Sky Tour 2026" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="MA_DMSK">Danh mục <span class="required">*</span></label>
+                        <select id="MA_DMSK" name="MA_DMSK" required>
+                            <option value="">-- Chọn danh mục --</option>
+                            <option value="1">Âm nhạc</option>
+                            <option value="2">Thể thao</option>
+                            <option value="4">Kịch nói</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="TG_BAT_DAU">Thời gian bắt đầu <span class="required">*</span></label>
+                        <input type="datetime-local" id="TG_BAT_DAU" name="TG_BAT_DAU" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="TG_KET_THUC">Thời gian kết thúc <span class="required">*</span></label>
+                        <input type="datetime-local" id="TG_KET_THUC" name="TG_KET_THUC" required>
+                    </div>
+                    <div class="form-group" style="flex: 1.5;">
+                        <label for="MA_DD">Địa điểm <span class="required">*</span></label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="MA_DD" name="MA_DD" style="flex-grow: 1;" required>
+                                <option value="">-- Chọn địa điểm --</option>
+                                <option value="1">Sân vận động Mỹ Đình</option>
+                                <option value="2">Nhà hát Lớn Hà Nội</option>
+                            </select>
+                            <button type="button" id="quick-add-location"
+                                    style="padding: 0 15px; font-weight: bold; background: #262532; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                                + Thêm mới
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="IMAGE_URL">Link Ảnh Poster</label>
+                        <input type="text" id="IMAGE_URL" name="IMAGE_URL" placeholder="Nhập URL hình ảnh...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="TRANG_THAI">Trạng thái</label>
+                        <select id="TRANG_THAI" name="TRANG_THAI">
+                            <option value="1">Mở bán vé (Hoạt động)</option>
+                            <option value="0">Tạm khóa / Ẩn</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="MO_TA">Mô tả sự kiện</label>
+                    <textarea id="MO_TA" name="MO_TA" rows="4"
+                              placeholder="Nhập thông tin chi tiết về sự kiện..."></textarea>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancel-add-btn">Hủy bỏ</button>
+            <button type="button" class="btn-save" id="save-event-btn">Lưu sự kiện</button>
+        </div>
+    </div>
+</div>
+
+<div id="ticket-builder-modal" class="modal-overlay">
+    <div class="modal-content"
+         style="width: 95vw; height: 90vh; max-width: 1400px; display: flex; flex-direction: column;">
+        <div class="modal-header">
+            <h2>🎟️ Cấu hình Vé & Sơ đồ ghế <span id="builder-event-name" style="color: #80ceff;"></span></h2>
+            <span class="close-modal-btn" id="close-builder-btn">&times;</span>
+        </div>
+
+        <div class="modal-body"
+             style="display: flex; gap: 20px; flex-grow: 1; overflow: hidden; padding: 20px; background-color: #f4f7f6;">
+
+            <div style="flex: 1; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                <h3 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">1. Các Hạng Vé
+                    (Ticket Classes)</h3>
+                <div class="form-row" style="margin-bottom: 10px; align-items: flex-end;">
+                    <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                        <input type="text" id="TEN_HG" placeholder="Tên hạng (VD: VIP, GA)">
+                    </div>
+                    <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                        <input type="number" id="GIA_TIEN" placeholder="Giá tiền (VNĐ)">
+                    </div>
+                    <button type="button" class="btn-save" id="btn-add-hg" style="height: 40px;">+ Thêm</button>
+                </div>
+                <ul id="list-hang-ghe"
+                    style="list-style: none; padding: 0; overflow-y: auto; flex-grow: 1; margin-top: 10px;">
+                </ul>
+            </div>
+
+            <div style="flex: 2.5; background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                <h3 style="margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px;">2. Khu Vực & Tạo
+                    Ghế Tự Động</h3>
+                <div class="form-row" style="align-items: flex-end;">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Tên khu vực</label>
+                        <input type="text" id="TEN_KV" placeholder="VD: Khán đài A">
+                    </div>
+                    <div class="form-group" style="flex: 2;">
+                        <label>Áp dụng Hạng vé</label>
+                        <select id="CHON_HG">
+                            <option value="">-- Chọn hạng --</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Dãy (Chữ cái)</label>
+                        <input type="text" id="DAY_GHE" placeholder="VD: A, B...">
+                    </div>
+                    <div class="form-group" style="flex: 1.5;">
+                        <label>Số ghế / Dãy</label>
+                        <input type="number" id="SO_GHE_DAY" placeholder="VD: 50">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn-save" id="btn-generate-seats"
+                                style="background-color: #f39c12; height: 40px;">⚡ Sinh Ghế
+                        </button>
+                    </div>
+                </div>
+
+                <div id="seat-preview-container"
+                     style="flex-grow: 1; margin-top: 15px; border: 2px dashed #ccc; border-radius: 8px; padding: 15px; overflow-y: auto; background-color: #fafafa;">
+                    <h4 style="text-align: center; color: #999; margin-top: 10%;">Bản xem trước Sơ đồ Ghế sẽ hiển thị
+                        tại đây</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancel-builder-btn">Đóng</button>
+            <button type="button" class="btn-save" id="save-builder-btn" style="background-color: #28a745;">💾 Lưu toàn
+                bộ Cấu hình Vé
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="pagination" id="event-pagination"></div>

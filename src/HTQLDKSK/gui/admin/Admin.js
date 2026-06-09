@@ -1,5 +1,20 @@
+const routeMap = {
+    // Nhóm Sự kiện
+    11: 'features/QuanLySuKien/CN11_SuKien',
+    12: 'features/QuanLySuKien/CN12_DiaDiem',
+    13: 'features/QuanLySuKien/CN13_DanhMuc',
+    14: 'features/QuanLySuKien/CN14_NgheSi',
+
+    // Nhóm Kinh Doanh
+    21: 'features/QuanLyKinhDoanh/CN21_DonHang',
+    22: 'features/QuanLyKinhDoanh/CN22_KhachHang',
+
+    // Nhóm Nhân sự
+    31: 'features/QuanLyNhanSu/CN31_TaiKhoan'
+};
+
 // =====================================================================
-// PHẦN 1: HỆ THỐNG LÕI (CORE) - QUẢN LÝ MENU VÀ CHUYỂN TAB
+// HỆ THỐNG LÕI (CORE) - QUẢN LÝ MENU VÀ CHUYỂN TAB
 // =====================================================================
 let menuDataFromDB = [];
 const navMenuContainer = document.querySelector('.nav-menu');
@@ -12,21 +27,47 @@ document.addEventListener('DOMContentLoaded', () => {
     startRealtimeClock();
 });
 
-// 1.1. Gọi API lấy Menu
 async function fetchMenusFromAPI() {
     try {
         const response = await fetch('http://localhost:8000/api/chuc-nang');
         if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
         menuDataFromDB = await response.json();
+
         navMenuContainer.replaceChildren();
         initializeSidebar();
     } catch (error) {
         console.error("Lỗi khi kết nối Backend:", error);
-        navMenuContainer.innerHTML = "<li style='color:red;'>Lỗi tải menu!</li>";
+        const errorLi = document.createElement('li');
+        errorLi.style.color = 'red';
+        errorLi.textContent = 'Lỗi tải menu!';
+        navMenuContainer.appendChild(errorLi);
     }
 }
 
-// 1.2. Vẽ Menu Trái (Sidebar)
+function startRealtimeClock() {
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+    if (!timeEl || !dateEl) return;
+
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        timeEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+        const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+        const dayName = days[now.getDay()];
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        dateEl.textContent = `${dayName}, ${day}/${month}/${year}`;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
 function initializeSidebar() {
     menuDataFromDB.forEach((menu, index) => {
         const liElement = document.createElement('li');
@@ -57,12 +98,11 @@ function initializeSidebar() {
     });
 }
 
-// 1.3. Vẽ Tabs Ngang (Top Tabs)
 function renderTopTabs(childrenArray) {
     topTabsContainer.replaceChildren();
 
     if (!childrenArray || childrenArray.length === 0) {
-        mainContentArea.innerHTML = '';
+        mainContentArea.replaceChildren();
         return;
     }
 
@@ -73,7 +113,7 @@ function renderTopTabs(childrenArray) {
 
         if (index === 0) {
             tabDiv.classList.add('active-tab');
-            loadTabContent(child.MA_CN); // Tự động load nội dung tab đầu tiên
+            loadTabContent(child.MA_CN);
         }
 
         tabDiv.addEventListener('click', () => {
@@ -88,146 +128,67 @@ function renderTopTabs(childrenArray) {
     });
 }
 
-// 1.4. Router tải HTML theo chức năng (Giống Controller)
 function loadTabContent(maChucNang) {
-    fetch(`features/CN${maChucNang}.html`)
+    // 1. Ẩn tất cả các tab đang hiển thị
+    Array.from(mainContentArea.children).forEach(child => {
+        child.style.display = 'none';
+    });
+
+    // 2. Lấy đường dẫn thực tế từ Route Map
+    const filePath = routeMap[maChucNang];
+
+    // 3. Khởi tạo ID tab
+    const tabId = `tab-content-${maChucNang}`;
+    let currentTab = document.getElementById(tabId);
+
+    // 4. KIỂM TRA: Nếu chức năng chưa làm (không có trong routeMap)
+    if (!filePath) {
+        if (!currentTab) {
+            currentTab = document.createElement('div');
+            currentTab.id = tabId;
+            currentTab.style.width = '100%';
+            currentTab.style.height = '100%';
+            currentTab.style.display = 'flex';
+            currentTab.style.flexDirection = 'column';
+            mainContentArea.appendChild(currentTab);
+        }
+        currentTab.style.display = 'flex';
+        currentTab.innerHTML = `<h2 style="color: white; text-align: center; margin-top: 50px;">🚧 Chức năng CN${maChucNang} đang được phát triển...</h2>`;
+        return;
+    }
+
+    // 5. KIỂM TRA: NẾU TAB ĐÃ TỒN TẠI (Đã tải trước đó) -> Chỉ cần hiện lên, KHÔNG fetch lại
+    if (currentTab) {
+        currentTab.style.display = 'flex';
+        return; // Kết thúc hàm, độ trễ = 0ms
+    }
+
+    // 6. NẾU TAB CHƯA TỒN TẠI -> Tạo container mới và hiện "Đang tải..."
+    currentTab = document.createElement('div');
+    currentTab.id = tabId;
+    currentTab.style.width = '100%';
+    currentTab.style.height = '100%';
+    currentTab.style.display = 'flex';
+    currentTab.style.flexDirection = 'column';
+    currentTab.innerHTML = `<h3 style="color: #80ceff; text-align: center; margin-top: 50px;">⏳ Đang tải giao diện...</h3>`;
+    mainContentArea.appendChild(currentTab);
+
+    // 7. Bắt đầu fetch file HTML THEO ĐƯỜNG DẪN MỚI
+    fetch(`${filePath}.html`)
         .then(response => {
             if (!response.ok) throw new Error("Chưa có file HTML");
             return response.text();
         })
         .then(data => {
-            // 1. Đổ mã HTML vào màn hình
-            mainContentArea.innerHTML = data;
+            // Đổ HTML tĩnh vào container riêng của tab này
+            currentTab.innerHTML = data;
 
-            // 2. Tùy theo Tab nào được mở thì gọi Data của Tab đó
-            if (maChucNang == 11) {
-                loadEventDataFromAPI(); // Gọi logic của CN11
-            } else if (maChucNang == 12) {
-                // loadLocationDataFromAPI(); // Sau này bạn làm CN12 thì gọi ở đây
-            }
+            // Chèn file JS tương ứng (thêm timestamp để tránh cache trình duyệt)
+            const script = document.createElement('script');
+            script.src = `${filePath}.js?t=${new Date().getTime()}`;
+            document.body.appendChild(script);
         })
         .catch(error => {
-            mainContentArea.innerHTML = `<h2 style="color: white; text-align: center; margin-top: 50px;">Đang phát triển tính năng: CN${maChucNang}</h2>`;
+            currentTab.innerHTML = `<h2 style="color: #ff6b6b; text-align: center; margin-top: 50px;">❌ Chức năng đang được xây dựng</h2>`;
         });
 }
-
-function startRealtimeClock() {
-    const timeEl = document.getElementById('clock-time');
-    const dateEl = document.getElementById('clock-date');
-    if (!timeEl || !dateEl) return;
-
-    function updateClock() {
-        const now = new Date();
-
-        // Lấy và format Giờ:Phút:Giây (luôn có 2 chữ số)
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        timeEl.textContent = `${hours}:${minutes}:${seconds}`;
-
-        // Lấy và format Thứ, Ngày/Tháng/Năm
-        const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-        const dayName = days[now.getDay()];
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0'); // Tháng trong JS bắt đầu từ 0
-        const year = now.getFullYear();
-        dateEl.textContent = `${dayName}, ${day}/${month}/${year}`;
-    }
-
-    updateClock(); // Gọi ngay lập tức để không bị delay 1 giây đầu tiên
-    setInterval(updateClock, 1000); // Lặp lại hàm mỗi 1000ms (1 giây)
-}
-
-
-// =====================================================================
-// PHẦN 2: LOGIC TỪNG CHỨC NĂNG (FEATURE MODULES)
-// =====================================================================
-
-// --------------------------------------------------------
-// [CN11] - QUẢN LÝ DANH SÁCH SỰ KIỆN
-// --------------------------------------------------------
-let currentEventData = [];
-let currentEventPage = 1;
-const rowsPerEventPage = 10;
-
-async function loadEventDataFromAPI() {
-    try {
-        const response = await fetch('http://localhost:8000/api/events');
-        if (!response.ok) throw new Error("Lỗi tải API sự kiện");
-        currentEventData = await response.json();
-        currentEventPage = 1;
-        renderEventTable();
-    } catch (error) {
-        console.error("Lỗi:", error);
-    }
-}
-
-function renderEventTable() {
-    const tbody = document.getElementById('event-table-body');
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-    const startIndex = (currentEventPage - 1) * rowsPerEventPage;
-    const pageData = currentEventData.slice(startIndex, startIndex + rowsPerEventPage);
-
-    pageData.forEach(sk => {
-        const tr = document.createElement('tr');
-
-        const dateObj = new Date(sk.TG_BAT_DAU);
-        const formattedDate = `${dateObj.getDate().toString().padStart(2,'0')} / ${(dateObj.getMonth()+1).toString().padStart(2,'0')} / ${dateObj.getFullYear()} - ${dateObj.getHours()}h${dateObj.getMinutes().toString().padStart(2,'0')}`;
-
-        tr.innerHTML = `
-            <td><strong>${sk.TEN_SK}</strong><br><small>SK${sk.MA_SK.toString().padStart(3,'0')} - ${sk.TEN_DM}</small></td>
-            <td>${formattedDate}</td>
-            <td>${sk.TEN_DD}</td>
-            <td>${sk.VE_DA_BAN}</td>
-            <td>${sk.TRANG_THAI === 1 ? 'Đang bán' : 'Đã khóa'}</td>
-            <td class="actions">
-                <img src="../img/EDIT.png" alt="Sửa" class="action-icon" title="Sửa">
-                <img src="../img/LOCK.png" alt="Khóa" class="action-icon" title="Khóa">
-                <img src="../img/DELETE.png" alt="Xóa" class="action-icon" title="Xóa">
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    // Bù dòng rỗng
-    for (let i = 0; i < (rowsPerEventPage - pageData.length); i++) {
-        const emptyTr = document.createElement('tr');
-        emptyTr.innerHTML = `<td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td>`;
-        tbody.appendChild(emptyTr);
-    }
-
-    renderEventPagination();
-}
-
-function renderEventPagination() {
-    const paginationContainer = document.getElementById('event-pagination');
-    if (!paginationContainer) return;
-
-    paginationContainer.innerHTML = '';
-    const totalPages = Math.max(1, Math.ceil(currentEventData.length / rowsPerEventPage));
-
-    const prevSpan = document.createElement('span');
-    prevSpan.textContent = '<';
-    prevSpan.onclick = () => { if (currentEventPage > 1) { currentEventPage--; renderEventTable(); } };
-    paginationContainer.appendChild(prevSpan);
-
-    for (let i = 1; i <= totalPages; i++) {
-        const pageSpan = document.createElement('span');
-        pageSpan.textContent = i;
-        if (i === currentEventPage) pageSpan.classList.add('active');
-
-        pageSpan.onclick = () => { currentEventPage = i; renderEventTable(); };
-        paginationContainer.appendChild(pageSpan);
-    }
-
-    const nextSpan = document.createElement('span');
-    nextSpan.textContent = '>';
-    nextSpan.onclick = () => { if (currentEventPage < totalPages) { currentEventPage++; renderEventTable(); } };
-    paginationContainer.appendChild(nextSpan);
-}
-
-// --------------------------------------------------------
-// [CN12] - QUẢN LÝ ĐỊA ĐIỂM (Viết logic ở đây sau này)
-// --------------------------------------------------------

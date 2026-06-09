@@ -1,0 +1,67 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <input type="text" placeholder="Tìm theo tên địa điểm, địa chỉ...">
+    </div>
+    <div class="tb-right">
+        <button class="add-btn" id="btn-open-add-location">+ Thêm Địa Điểm</button>
+    </div>
+</div>
+
+<div class="reusable-table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>Mã ĐĐ</th>
+            <th>Tên địa điểm</th>
+            <th>Địa chỉ</th>
+            <th>Lưới sơ đồ (Cột x Hàng)</th>
+            <th>Thao tác</th> </tr>
+        </tr>
+        </thead>
+        <tbody id="location-table-body">
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination" id="location-pagination"></div>
+
+<div id="add-location-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="location-modal-title">Thêm Địa Điểm Mới</h2>
+            <span class="close-modal-btn" id="close-location-modal">&times;</span>
+        </div>
+
+        <div class="modal-body">
+            <form id="locationForm">
+                <div class="form-group">
+                    <label for="TEN_DD">Tên địa điểm <span class="required">*</span></label>
+                    <input type="text" id="TEN_DD" name="TEN_DD" placeholder="VD: Nhà hát Hòa Bình" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="DIA_CHI">Địa chỉ chi tiết <span class="required">*</span></label>
+                    <textarea id="DIA_CHI" name="DIA_CHI" rows="2" placeholder="VD: Đường 3/2, Quận 10, TP.HCM"
+                              required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="TONG_SO_COT">Tổng số cột (Grid Columns) <span class="required">*</span></label>
+                        <input type="number" id="TONG_SO_COT" name="TONG_SO_COT" min="1" placeholder="VD: 40" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="TONG_SO_HANG">Tổng số hàng (Grid Rows) <span class="required">*</span></label>
+                        <input type="number" id="TONG_SO_HANG" name="TONG_SO_HANG" min="1" placeholder="VD: 30"
+                               required>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" id="cancel-location-btn">Hủy bỏ</button>
+            <button type="button" class="btn-save" id="save-location-btn">Lưu địa điểm</button>
+        </div>
+    </div>
+</div>

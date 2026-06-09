@@ -1,4 +1,5 @@
 from dao.dia_diem_dao import DiaDiemDAO
+from dto.dia_diem import DiaDiem
 
 class DiaDiemBUS:
     def __init__(self, db_connection):
@@ -24,3 +25,40 @@ class DiaDiemBUS:
 
         # Trả về dữ liệu khu vực đã được "bơm" đầy đủ thông tin ghế bên trong
         return danh_sach_khu_vuc
+
+    def getList(self):
+        dsDD = self.dao.getList()
+
+        return dsDD
+
+    def get_all_dia_diem(self):
+        danh_sach_dto = self.dao.get_all()
+        # Biến mảng DTO thành mảng Dictionary để chuẩn bị ép thành JSON
+        return [dd.to_dict() for dd in danh_sach_dto]
+
+    def add_dia_diem(self, data):
+        if not data.get('TEN_DD') or not data.get('DIA_CHI'):
+            raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
+
+        # Khởi tạo DTO (ma_dd = None vì MySQL tự tăng AUTO_INCREMENT)
+        new_dd = DiaDiem(None, data['TEN_DD'], data['DIA_CHI'], data.get('TONG_SO_COT', 10),
+                         data.get('TONG_SO_HANG', 10))
+        return self.dao.insert(new_dd)
+
+    def update_dia_diem(self, ma_dd, data):
+        if not data.get('TEN_DD') or not data.get('DIA_CHI'):
+            raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
+
+        # Khởi tạo DTO chứa mã cần update
+        updated_dd = DiaDiem(ma_dd, data['TEN_DD'], data['DIA_CHI'], data.get('TONG_SO_COT', 10),
+                             data.get('TONG_SO_HANG', 10))
+        return self.dao.update(updated_dd)
+
+    def delete_dia_diem(self, ma_dd):
+        try:
+            return self.dao.delete(ma_dd)
+        except Exception as e:
+            # Bắt lỗi Khóa ngoại (Foreign Key Constraint) nếu địa điểm này đã có sự kiện tổ chức
+            if "foreign key constraint fails" in str(e).lower():
+                raise ValueError("Không thể xóa! Địa điểm này đang được sử dụng cho một hoặc nhiều Sự kiện.")
+            raise e

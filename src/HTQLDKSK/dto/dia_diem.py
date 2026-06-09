@@ -9,7 +9,7 @@ class DiaDiem:
     @property
     def ma_dd(self):
         return self._ma_dd
-    
+
     @ma_dd.setter
     def ma_dd(self, value):
         self._ma_dd = value
@@ -45,3 +45,12 @@ class DiaDiem:
     @tong_so_hang.setter
     def tong_so_hang(self, value):
         self._tong_so_hang = value
+
+    def to_dict(self):
+        return {
+            "MA_DD": self._ma_dd,
+            "TEN_DD": self._ten_dd,
+            "DIA_CHI": self._dia_chi,
+            "TONG_SO_COT": self._tong_so_cot,
+            "TONG_SO_HANG": self._tong_so_hang
+        }
