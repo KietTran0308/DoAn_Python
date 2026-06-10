@@ -26,7 +26,7 @@ class SuKienDAO:
 
         return data
 
-    def getChiTietSK(self, ma_sk):
+    def get_chi_tiet_su_kien(self, ma_sk):
         cursor = self.db.cursor(dictionary=True)
         query = """
                 SELECT sk.*, dm.TEN_DM, dd.TEN_DD, dd.DIA_CHI
