@@ -16,7 +16,6 @@ class TaiKhoanDAO:
                 tk.TEN_TK,
                 tk.MAT_KHAU,
                 tk.TRANG_THAI,
-                tk.NGAY_TAO,
                 nq.TEN_NQ
             FROM tai_khoan tk
             JOIN nhom_quyen nq ON tk.MA_NQ = nq.MA_NQ

@@ -26,8 +26,8 @@ class TaiKhoanBUS:
 
     # format mã hiển thị: YY + 6 số
     @staticmethod
-    def format_ma_tk(ma_tk: int, ngay_tao: datetime) -> str:
-        nam = ngay_tao.year % 100
+    def format_ma_tk(ma_tk: int) -> str:
+        nam = datetime.now().year % 100
         return f"{nam}{ma_tk:06d}"
 
     # đăng nhập
@@ -68,10 +68,7 @@ class TaiKhoanBUS:
             "message": "Đăng nhập thành công",
             "data": {
                 "ma_tk": tai_khoan["MA_TK"],
-                "ma_hien_thi": self.format_ma_tk(
-                    tai_khoan["MA_TK"],
-                    tai_khoan["NGAY_TAO"]
-                ),
+                "ma_hien_thi": self.format_ma_tk(tai_khoan["MA_TK"]),
                 "ten_tk": tai_khoan["TEN_TK"],
                 "quyen": tai_khoan["TEN_NQ"],
                 "ho_ten": f"{thong_tin['HO']} {thong_tin['TEN']}"
@@ -113,9 +110,6 @@ class TaiKhoanBUS:
             "message": "Đăng ký thành công",
             "data": {
                 "ma_tk": ma_tk,
-                "ma_hien_thi": self.format_ma_tk(
-                    ma_tk,
-                    datetime.now()
-                )
+                "ma_hien_thi": self.format_ma_tk(ma_tk)
             }
         }
