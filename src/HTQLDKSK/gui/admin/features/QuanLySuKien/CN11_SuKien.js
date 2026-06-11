@@ -22,8 +22,24 @@
         } catch (error) {
             console.error("Dùng dữ liệu giả định do lỗi API:", error);
             currentEventData = [
-                { MA_SK: 1, TEN_SK: 'Sky Tour 2026', TEN_DM: 'Âm nhạc', TG_BAT_DAU: '2026-08-15T19:00:00', TEN_DD: 'Sân vận động Mỹ Đình', VE_DA_BAN: 1250, TRANG_THAI: 1 },
-                { MA_SK: 3, TEN_SK: 'Kịch Tấm Cám', TEN_DM: 'Kịch nói', TG_BAT_DAU: '2026-06-20T20:00:00', TEN_DD: 'Nhà hát Hòa Bình', VE_DA_BAN: 450, TRANG_THAI: 1 }
+                {
+                    MA_SK: 1,
+                    TEN_SK: 'Sky Tour 2026',
+                    TEN_DM: 'Âm nhạc',
+                    TG_BAT_DAU: '2026-08-15T19:00:00',
+                    TEN_DD: 'Sân vận động Mỹ Đình',
+                    VE_DA_BAN: 1250,
+                    TRANG_THAI: 1
+                },
+                {
+                    MA_SK: 3,
+                    TEN_SK: 'Kịch Tấm Cám',
+                    TEN_DM: 'Kịch nói',
+                    TG_BAT_DAU: '2026-06-20T20:00:00',
+                    TEN_DD: 'Nhà hát Hòa Bình',
+                    VE_DA_BAN: 450,
+                    TRANG_THAI: 1
+                }
             ];
         }
         currentEventPage = 1;
@@ -42,14 +58,14 @@
             const tr = document.createElement('tr');
 
             const dateObj = new Date(sk.TG_BAT_DAU);
-            const formattedDate = `${dateObj.getDate().toString().padStart(2,'0')} / ${(dateObj.getMonth()+1).toString().padStart(2,'0')} / ${dateObj.getFullYear()} - ${dateObj.getHours()}h${dateObj.getMinutes().toString().padStart(2,'0')}`;
+            const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')} / ${(dateObj.getMonth() + 1).toString().padStart(2, '0')} / ${dateObj.getFullYear()} - ${dateObj.getHours()}h${dateObj.getMinutes().toString().padStart(2, '0')}`;
 
             const tdName = document.createElement('td');
             const strong = document.createElement('strong');
             strong.textContent = sk.TEN_SK;
             const br = document.createElement('br');
             const small = document.createElement('small');
-            small.textContent = `SK${sk.MA_SK.toString().padStart(3,'0')} - ${sk.TEN_DM}`;
+            small.textContent = `SK${sk.MA_SK.toString().padStart(3, '0')} - ${sk.TEN_DM}`;
             tdName.append(strong, br, small);
 
             const tdDate = document.createElement('td');
@@ -115,20 +131,33 @@
 
         const prevSpan = document.createElement('span');
         prevSpan.textContent = '<';
-        prevSpan.onclick = () => { if (currentEventPage > 1) { currentEventPage--; renderEventTable(); } };
+        prevSpan.onclick = () => {
+            if (currentEventPage > 1) {
+                currentEventPage--;
+                renderEventTable();
+            }
+        };
         paginationContainer.appendChild(prevSpan);
 
         for (let i = 1; i <= totalPages; i++) {
             const pageSpan = document.createElement('span');
             pageSpan.textContent = i;
             if (i === currentEventPage) pageSpan.classList.add('active');
-            pageSpan.onclick = () => { currentEventPage = i; renderEventTable(); };
+            pageSpan.onclick = () => {
+                currentEventPage = i;
+                renderEventTable();
+            };
             paginationContainer.appendChild(pageSpan);
         }
 
         const nextSpan = document.createElement('span');
         nextSpan.textContent = '>';
-        nextSpan.onclick = () => { if (currentEventPage < totalPages) { currentEventPage++; renderEventTable(); } };
+        nextSpan.onclick = () => {
+            if (currentEventPage < totalPages) {
+                currentEventPage++;
+                renderEventTable();
+            }
+        };
         paginationContainer.appendChild(nextSpan);
     }
 
@@ -140,7 +169,9 @@
 
         if (!addBtn || !modal) return;
 
-        const openModal = () => { modal.style.display = 'flex'; };
+        const openModal = () => {
+            modal.style.display = 'flex';
+        };
         const closeModal = () => {
             modal.style.display = 'none';
             const form = document.getElementById('addEventForm');
@@ -150,7 +181,9 @@
         addBtn.addEventListener('click', openModal);
         closeBtn.addEventListener('click', closeModal);
         cancelBtn.addEventListener('click', closeModal);
-        window.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) closeModal();
+        });
     }
 
     function setupTicketBuilderEvents() {
@@ -158,6 +191,54 @@
         const cancelBuilderBtn = document.getElementById('cancel-builder-btn');
         if (closeBuilderBtn) closeBuilderBtn.addEventListener('click', closeTicketBuilder);
         if (cancelBuilderBtn) cancelBuilderBtn.addEventListener('click', closeTicketBuilder);
+
+        // Bổ sung: Tìm container của trường Tên khu vực để chèn Loại khu vực
+        const tenKVInput = document.getElementById('TEN_KV');
+        if (tenKVInput) {
+            const formRowKV = tenKVInput.closest('.form-row');
+
+            // Tạo UI bằng DOM API
+            const formGroupLoaiKV = document.createElement('div');
+            formGroupLoaiKV.className = 'form-group';
+            formGroupLoaiKV.style.flex = '1.5';
+
+            const labelLoaiKV = document.createElement('label');
+            labelLoaiKV.textContent = 'Loại khu vực';
+
+            const selectLoaiKV = document.createElement('select');
+            selectLoaiKV.id = 'LOAI_KV';
+
+            const optSeating = document.createElement('option');
+            optSeating.value = 'SEATING';
+            optSeating.textContent = 'Ghế ngồi';
+
+            const optStanding = document.createElement('option');
+            optStanding.value = 'STANDING';
+            optStanding.textContent = 'Khu đứng (Tự do)';
+
+            selectLoaiKV.append(optSeating, optStanding);
+            formGroupLoaiKV.append(labelLoaiKV, selectLoaiKV);
+
+            // Chèn Select vào trước ô Dãy ghế
+            formRowKV.insertBefore(formGroupLoaiKV, document.getElementById('DAY_GHE').closest('.form-group'));
+
+            // Sự kiện: Đổi LOAI_KV thì ẩn/hiện nhập Dãy và đổi nhãn Số ghế thành Sức chứa
+            selectLoaiKV.addEventListener('change', (e) => {
+                const isStanding = e.target.value === 'STANDING';
+                const dayGheGroup = document.getElementById('DAY_GHE').closest('.form-group');
+                const soGheGroup = document.getElementById('SO_GHE_DAY').closest('.form-group');
+
+                if (isStanding) {
+                    dayGheGroup.style.display = 'none';
+                    soGheGroup.querySelector('label').textContent = 'Sức chứa tối đa';
+                    document.getElementById('SO_GHE_DAY').placeholder = 'VD: 1000';
+                } else {
+                    dayGheGroup.style.display = 'block';
+                    soGheGroup.querySelector('label').textContent = 'Số ghế / Dãy';
+                    document.getElementById('SO_GHE_DAY').placeholder = 'VD: 50';
+                }
+            });
+        }
 
         const btnAddHg = document.getElementById('btn-add-hg');
         if (btnAddHg) {
@@ -169,7 +250,7 @@
 
                 if (!tenHG || !giaTien) return alert("Vui lòng nhập tên hạng và giá tiền!");
 
-                builder_dsHangGhe.push({ id: Date.now(), TEN_HG: tenHG, GIA_TIEN: parseInt(giaTien) });
+                builder_dsHangGhe.push({id: Date.now(), TEN_HG: tenHG, GIA_TIEN: parseInt(giaTien)});
                 tenHGInput.value = '';
                 giaTienInput.value = '';
                 renderHangGheList();
@@ -181,22 +262,35 @@
             btnGenSeats.addEventListener('click', () => {
                 const tenKVInput = document.getElementById('TEN_KV');
                 const hgId = document.getElementById('CHON_HG').value;
+                const loaiKV = document.getElementById('LOAI_KV').value; // Lấy giá trị loại KV
                 const dayGheInput = document.getElementById('DAY_GHE');
                 const soGheDayInput = document.getElementById('SO_GHE_DAY');
 
                 const tenKV = tenKVInput.value.trim();
                 const dayGhe = dayGheInput.value.toUpperCase().trim();
-                const soGheDay = parseInt(soGheDayInput.value);
+                const soGheDay = parseInt(soGheDayInput.value); // Là sức chứa nếu STANDING
 
-                if (!tenKV || !hgId || !dayGhe || !soGheDay) {
-                    return alert("Vui lòng điền đủ thông tin khu vực và dãy ghế!");
+                // Kiểm tra validate linh hoạt
+                if (!tenKV || !hgId || isNaN(soGheDay)) {
+                    return alert("Vui lòng điền đủ thông tin khu vực!");
+                }
+                if (loaiKV === 'SEATING' && !dayGhe) {
+                    return alert("Vui lòng nhập tên dãy ghế cho khu vực ngồi!");
                 }
 
                 const hgSelected = builder_dsHangGhe.find(h => h.id == hgId);
                 let danhSachGheMoi = [];
 
-                for (let i = 1; i <= soGheDay; i++) {
-                    danhSachGheMoi.push({ DAY_GHE: dayGhe, SO_GHE: i, TEN_GHE: `${dayGhe}${i}` });
+                // Phân nhánh logic sinh ghế
+                if (loaiKV === 'SEATING') {
+                    for (let i = 1; i <= soGheDay; i++) {
+                        danhSachGheMoi.push({DAY_GHE: dayGhe, SO_GHE: i, TEN_GHE: `${dayGhe}${i}`});
+                    }
+                } else {
+                    // Tạo ghế ảo cho STANDING bằng cách gán cứng tiền tố
+                    for (let i = 1; i <= soGheDay; i++) {
+                        danhSachGheMoi.push({DAY_GHE: 'FZONE', SO_GHE: i, TEN_GHE: `FZONE-${i}`});
+                    }
                 }
 
                 const existingKVIndex = builder_dsKhuVuc.findIndex(kv => kv.TEN_KV === tenKV);
@@ -208,6 +302,7 @@
                         id: Date.now(),
                         TEN_KV: tenKV,
                         HANG_GHE: hgSelected,
+                        LOAI_KV: loaiKV, // Lưu loại khu vực vào state
                         SUC_CHUA: soGheDay,
                         GHE_LIST: danhSachGheMoi
                     });
@@ -215,18 +310,69 @@
 
                 dayGheInput.value = '';
                 soGheDayInput.value = '';
-                renderSeatPreview();
+                renderCanvasPreview();
             });
         }
     }
 
-    function openTicketBuilder(maSK, tenSK) {
+    async function openTicketBuilder(maSK, tenSK) {
         document.getElementById('builder-event-name').textContent = `- ${tenSK}`;
         document.getElementById('ticket-builder-modal').style.display = 'flex';
-        builder_dsHangGhe = [];
-        builder_dsKhuVuc = [];
+
+        // 1. Hiển thị thông báo đang tải trên Canvas
+        const canvas = document.getElementById('seatMapCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#666';
+        ctx.font = '20px Arial';
+        ctx.fillText('⏳ Đang tải dữ liệu sơ đồ...', 50, 50);
+
+        try {
+            // 2. Gọi API thực tế để lấy sơ đồ của Sự kiện này
+            // Lưu ý: Backend của bạn cần viết API trả về cấu trúc tương tự dữ liệu giả lập bên dưới
+            const response = await fetch(`http://localhost:8000/api/events/${maSK}/seats`);
+            if (!response.ok) throw new Error("Chưa có API thực tế");
+            const data = await response.json();
+
+            builder_dsHangGhe = data.hang_ghe;
+            builder_dsKhuVuc = data.khu_vuc;
+        } catch (error) {
+            console.warn("Dùng dữ liệu giả định vì chưa có API backend:", error);
+
+            // 3. GIẢ LẬP DỮ LIỆU TỪ DATABASE (VD: Cho sự kiện Sky Tour - Mã: 1)
+            if (maSK === 1) {
+                builder_dsHangGhe = [
+                    {id: 1, TEN_HG: 'VIP', GIA_TIEN: 5000000},
+                    {id: 2, TEN_HG: 'GA (Fanzone)', GIA_TIEN: 1500000}
+                ];
+                builder_dsKhuVuc = [
+                    {
+                        id: 1, TEN_KV: 'Khán đài A', LOAI_KV: 'SEATING', SUC_CHUA: 15, HANG_GHE: builder_dsHangGhe[0],
+                        GHE_LIST: Array.from({length: 15}, (_, i) => ({
+                            DAY_GHE: 'A',
+                            SO_GHE: i + 1,
+                            TEN_GHE: `A${i + 1}`
+                        }))
+                    },
+                    {
+                        id: 2,
+                        TEN_KV: 'Fanzone Mặt sân',
+                        LOAI_KV: 'STANDING',
+                        SUC_CHUA: 1000,
+                        HANG_GHE: builder_dsHangGhe[1],
+                        GHE_LIST: []
+                    }
+                ];
+            } else {
+                // Nếu là sự kiện chưa có sơ đồ -> Trả về mảng rỗng để tạo mới
+                builder_dsHangGhe = [];
+                builder_dsKhuVuc = [];
+            }
+        }
+
+        // 4. Render lại giao diện sau khi có dữ liệu
         renderHangGheList();
-        renderSeatPreview();
+        renderCanvasPreview();
     }
 
     function closeTicketBuilder() {
@@ -278,37 +424,125 @@
             kvDiv.style.cssText = "margin-bottom: 25px; border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.02);";
 
             const headerDiv = document.createElement('div');
-            headerDiv.style.cssText = "display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;";
+            headerDiv.style.cssText = "display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;";
+
+            const titleWrapper = document.createElement('div');
 
             const h4 = document.createElement('h4');
-            h4.style.cssText = "color: #262532; margin: 0;";
+            h4.style.cssText = "color: #262532; margin: 0; display: inline-block;";
             h4.textContent = `📍 ${kv.TEN_KV} `;
 
             const small = document.createElement('small');
-            small.style.cssText = "color: #666; font-weight: normal;";
-            small.textContent = `(Tổng: ${kv.SUC_CHUA} ghế)`;
-            h4.appendChild(small);
+            small.style.cssText = "color: #666; font-weight: normal; margin-left: 5px;";
+            small.textContent = `(Tổng: ${kv.SUC_CHUA} vé)`;
+
+            // Nhãn phân loại
+            const typeLabel = document.createElement('span');
+            typeLabel.style.cssText = "margin-left: 10px; background: #6c757d; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px;";
+            typeLabel.textContent = kv.LOAI_KV === 'STANDING' ? 'Vé Đứng' : 'Vé Ngồi';
+
+            h4.append(small, typeLabel);
+            titleWrapper.appendChild(h4);
 
             const spanHg = document.createElement('span');
-            spanHg.style.cssText = "background: #28a745; color: white; padding: 3px 10px; border-radius: 20px; font-size: 13px;";
+            spanHg.style.cssText = "background: #28a745; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold;";
             spanHg.textContent = kv.HANG_GHE.TEN_HG;
 
-            headerDiv.append(h4, spanHg);
+            headerDiv.append(titleWrapper, spanHg);
 
             const flexDiv = document.createElement('div');
             flexDiv.style.cssText = "display: flex; flex-wrap: wrap;";
 
-            kv.GHE_LIST.forEach(g => {
-                const seatSpan = document.createElement('span');
-                seatSpan.style.cssText = "display:inline-block; width:35px; height:35px; line-height:35px; text-align:center; background:#6a95b8; color:white; border-radius:6px; margin:3px; font-size:12px; font-weight:bold;";
-                seatSpan.textContent = g.TEN_GHE;
-                flexDiv.appendChild(seatSpan);
-            });
+            // Phân biệt cách render danh sách ghế
+            if (kv.LOAI_KV === 'STANDING') {
+                const standingMsg = document.createElement('div');
+                standingMsg.style.cssText = "width: 100%; padding: 15px; text-align: center; background: #f8f9fa; border: 1px dashed #ced4da; border-radius: 6px; color: #495057; font-style: italic;";
+                standingMsg.textContent = `Hệ thống đã tự động lưu trữ ${kv.SUC_CHUA} vé ảo cho khu vực tự do này.`;
+                flexDiv.appendChild(standingMsg);
+            } else {
+                kv.GHE_LIST.forEach(g => {
+                    const seatSpan = document.createElement('span');
+                    seatSpan.style.cssText = "display:inline-block; width:35px; height:35px; line-height:35px; text-align:center; background:#6a95b8; color:white; border-radius:6px; margin:3px; font-size:12px; font-weight:bold;";
+                    seatSpan.textContent = g.TEN_GHE;
+                    flexDiv.appendChild(seatSpan);
+                });
+            }
 
             kvDiv.append(headerDiv, flexDiv);
             container.appendChild(kvDiv);
         });
     }
+
+    function renderCanvasPreview() {
+    const canvas = document.getElementById('seatMapCanvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let currentYOffset = 60; // Dùng để dời tọa độ Y xuống sau mỗi khu vực
+
+    if (builder_dsKhuVuc.length === 0) {
+        ctx.fillStyle = '#aaa';
+        ctx.font = 'italic 16px Arial';
+        ctx.fillText('Sơ đồ trống. Vui lòng tạo khu vực và sinh ghế.', 50, 50);
+        return;
+    }
+
+    builder_dsKhuVuc.forEach(kv => {
+        // 1. In tiêu đề khu vực
+        ctx.fillStyle = '#262532';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'left';
+        const title = `📍 ${kv.TEN_KV} (${kv.LOAI_KV === 'STANDING' ? 'Khu đứng' : 'Ghế ngồi'}) - Giá: ${kv.HANG_GHE.TEN_HG}`;
+        ctx.fillText(title, 20, currentYOffset - 25);
+
+        // 2. Vẽ chi tiết tùy theo loại
+        if (kv.LOAI_KV === 'SEATING') {
+            kv.GHE_LIST.forEach((ghe, index) => {
+                const x = 40 + (index % 20) * 40; // 20 ghế 1 hàng, cách nhau 40px
+                const y = currentYOffset + Math.floor(index / 20) * 40;
+
+                // Vẽ hình tròn (Ghế)
+                ctx.beginPath();
+                ctx.arc(x, y, 14, 0, Math.PI * 2);
+                ctx.fillStyle = '#6a95b8';
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#262532';
+                ctx.stroke();
+
+                // Tên ghế
+                ctx.fillStyle = 'white';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(ghe.TEN_GHE, x, y);
+            });
+
+            // Tính toán khoảng cách dời xuống cho khu vực tiếp theo
+            const totalRows = Math.ceil(kv.GHE_LIST.length / 20);
+            currentYOffset += totalRows * 40 + 60;
+
+        } else if (kv.LOAI_KV === 'STANDING') {
+            // Vẽ hộp đại diện cho Fanzone
+            ctx.fillStyle = 'rgba(243, 156, 18, 0.15)';
+            ctx.strokeStyle = '#f39c12';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]); // Viền đứt nét
+            ctx.strokeRect(20, currentYOffset - 10, 300, 80);
+            ctx.fillRect(20, currentYOffset - 10, 300, 80);
+            ctx.setLineDash([]); // Reset viền
+
+            ctx.fillStyle = '#d35400';
+            ctx.font = 'italic 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Tổng sức chứa: ${kv.SUC_CHUA} vé tự do`, 170, currentYOffset + 35);
+
+            currentYOffset += 80 + 60;
+        }
+    });
+}
 
     // Kích hoạt
     init();

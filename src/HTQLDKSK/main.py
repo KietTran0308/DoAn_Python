@@ -15,7 +15,6 @@ app.config['SESSION_TYPE'] = 'filesystem'
 # Đăng ký các Blueprint (API routes)
 app.register_blueprint(tai_khoan_api)
 
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """

@@ -1,10 +1,11 @@
 class DiaDiem:
-    def __init__(self, ma_dd, ten_dd, dia_chi, tong_so_cot, tong_so_hang):
+    def __init__(self, ma_dd, ten_dd, dia_chi, tong_so_cot, tong_so_hang, layout_data=None):
         self._ma_dd = ma_dd
         self._ten_dd = ten_dd
         self._dia_chi = dia_chi
         self._tong_so_cot = tong_so_cot
         self._tong_so_hang = tong_so_hang
+        self._layout_data = layout_data
     
     @property
     def ma_dd(self):
@@ -46,11 +47,20 @@ class DiaDiem:
     def tong_so_hang(self, value):
         self._tong_so_hang = value
 
+    @property
+    def layout_data(self):
+        return self._layout_data
+
+    @layout_data.setter
+    def layout_data(self, value):
+        self._layout_data = value
+
     def to_dict(self):
         return {
             "MA_DD": self._ma_dd,
             "TEN_DD": self._ten_dd,
             "DIA_CHI": self._dia_chi,
             "TONG_SO_COT": self._tong_so_cot,
-            "TONG_SO_HANG": self._tong_so_hang
+            "TONG_SO_HANG": self._tong_so_hang,
+            "LAYOUT_DATA": self._layout_data
         }

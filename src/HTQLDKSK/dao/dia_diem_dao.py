@@ -38,47 +38,26 @@ class DiaDiemDAO:
         cursor.close()
         return result
 
-    from dto.dia_diem import DiaDiem  # Nhập class DTO
+    def insert(self, dd: DiaDiem):
+        cursor = self.db.cursor()
+        query = "INSERT INTO dia_diem (TEN_DD, DIA_CHI, TONG_SO_COT, TONG_SO_HANG, LAYOUT_DATA) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query, (dd.ten_dd, dd.dia_chi, dd.tong_so_cot, dd.tong_so_hang, dd.layout_data))
+        self.db.commit()
+        cursor.close()
+        return True
 
-    class DiaDiemDAO:
-        def __init__(self, db_connection):
-            self.db = db_connection
+    def update(self, dd: DiaDiem):
+        cursor = self.db.cursor()
+        query = "UPDATE dia_diem SET TEN_DD = %s, DIA_CHI = %s, TONG_SO_COT = %s, TONG_SO_HANG = %s, LAYOUT_DATA = %s WHERE MA_DD = %s"
+        cursor.execute(query, (dd.ten_dd, dd.dia_chi, dd.tong_so_cot, dd.tong_so_hang, dd.layout_data, dd.ma_dd))
+        self.db.commit()
+        cursor.close()
+        return True
 
-        # --- Các hàm lấy sơ đồ ghế cũ giữ nguyên ---
-        # def get_khu_vuc_by_su_kien(self, ma_sk): ...
-        # def get_ghe_by_khu_vuc(self, ma_kv): ...
-
-        def get_all(self):
-            cursor = self.db.cursor(dictionary=True)
-            query = "SELECT MA_DD, TEN_DD, DIA_CHI, TONG_SO_COT, TONG_SO_HANG FROM dia_diem"
-            cursor.execute(query)
-            rows = cursor.fetchall()
-            cursor.close()
-
-            # Ánh xạ dữ liệu từ Database vào đối tượng DTO
-            return [DiaDiem(row['MA_DD'], row['TEN_DD'], row['DIA_CHI'], row['TONG_SO_COT'], row['TONG_SO_HANG']) for
-                    row in rows]
-
-        def insert(self, dd: DiaDiem):
-            cursor = self.db.cursor()
-            query = "INSERT INTO dia_diem (TEN_DD, DIA_CHI, TONG_SO_COT, TONG_SO_HANG) VALUES (%s, %s, %s, %s)"
-            cursor.execute(query, (dd.ten_dd, dd.dia_chi, dd.tong_so_cot, dd.tong_so_hang))
-            self.db.commit()
-            cursor.close()
-            return True
-
-        def update(self, dd: DiaDiem):
-            cursor = self.db.cursor()
-            query = "UPDATE dia_diem SET TEN_DD = %s, DIA_CHI = %s, TONG_SO_COT = %s, TONG_SO_HANG = %s WHERE MA_DD = %s"
-            cursor.execute(query, (dd.ten_dd, dd.dia_chi, dd.tong_so_cot, dd.tong_so_hang, dd.ma_dd))
-            self.db.commit()
-            cursor.close()
-            return True
-
-        def delete(self, ma_dd):
-            cursor = self.db.cursor()
-            query = "DELETE FROM dia_diem WHERE MA_DD = %s"
-            cursor.execute(query, (ma_dd,))
-            self.db.commit()
-            cursor.close()
-            return True
+    def delete(self, ma_dd):
+        cursor = self.db.cursor()
+        query = "DELETE FROM dia_diem WHERE MA_DD = %s"
+        cursor.execute(query, (ma_dd,))
+        self.db.commit()
+        cursor.close()
+        return True

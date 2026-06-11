@@ -40,18 +40,16 @@ class DiaDiemBUS:
         if not data.get('TEN_DD') or not data.get('DIA_CHI'):
             raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
 
-        # Khởi tạo DTO (ma_dd = None vì MySQL tự tăng AUTO_INCREMENT)
         new_dd = DiaDiem(None, data['TEN_DD'], data['DIA_CHI'], data.get('TONG_SO_COT', 10),
-                         data.get('TONG_SO_HANG', 10))
+                         data.get('TONG_SO_HANG', 10), data.get('LAYOUT_DATA', None))
         return self.dao.insert(new_dd)
 
     def update_dia_diem(self, ma_dd, data):
         if not data.get('TEN_DD') or not data.get('DIA_CHI'):
             raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
 
-        # Khởi tạo DTO chứa mã cần update
         updated_dd = DiaDiem(ma_dd, data['TEN_DD'], data['DIA_CHI'], data.get('TONG_SO_COT', 10),
-                             data.get('TONG_SO_HANG', 10))
+                             data.get('TONG_SO_HANG', 10), data.get('LAYOUT_DATA', None))
         return self.dao.update(updated_dd)
 
     def delete_dia_diem(self, ma_dd):

@@ -1,6 +1,6 @@
 <div class="toolbar">
     <div class="tb-left">
-        <input type="text" placeholder="Tìm theo tên địa điểm, địa chỉ...">
+        <input type="text" class="reusable-search-box" placeholder="Tìm theo tên địa điểm, địa chỉ...">
     </div>
     <div class="tb-right">
         <button class="add-btn" id="btn-open-add-location">+ Thêm Địa Điểm</button>
@@ -25,43 +25,44 @@
 
 <div class="pagination" id="location-pagination"></div>
 
-<div id="add-location-modal" class="modal-overlay">
-    <div class="modal-content">
+<div id="layout-builder-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1600px; display: flex; flex-direction: column;">
         <div class="modal-header">
-            <h2 id="location-modal-title">Thêm Địa Điểm Mới</h2>
-            <span class="close-modal-btn" id="close-location-modal">&times;</span>
+            <h2>🗺️ Thiết kế Sơ đồ gốc: <span id="layout-location-name" style="color: #80ceff;"></span></h2>
+            <span class="close-modal-btn" id="close-layout-modal">&times;</span>
         </div>
 
-        <div class="modal-body">
-            <form id="locationForm">
-                <div class="form-group">
-                    <label for="TEN_DD">Tên địa điểm <span class="required">*</span></label>
-                    <input type="text" id="TEN_DD" name="TEN_DD" placeholder="VD: Nhà hát Hòa Bình" required>
-                </div>
+        <div class="modal-body" style="display: flex; gap: 20px; flex-grow: 1; padding: 20px; background-color: #f4f7f6; overflow: hidden;">
+            <div style="flex: 1; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-y: auto;">
+                <h3>Công cụ thiết kế</h3>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
 
                 <div class="form-group">
-                    <label for="DIA_CHI">Địa chỉ chi tiết <span class="required">*</span></label>
-                    <textarea id="DIA_CHI" name="DIA_CHI" rows="2" placeholder="VD: Đường 3/2, Quận 10, TP.HCM"
-                              required></textarea>
+                    <label>Tải ảnh mặt bằng (Tùy chọn)</label>
+                    <input type="file" id="upload-background" accept="image/*">
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="TONG_SO_COT">Tổng số cột (Grid Columns) <span class="required">*</span></label>
-                        <input type="number" id="TONG_SO_COT" name="TONG_SO_COT" min="1" placeholder="VD: 40" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="TONG_SO_HANG">Tổng số hàng (Grid Rows) <span class="required">*</span></label>
-                        <input type="number" id="TONG_SO_HANG" name="TONG_SO_HANG" min="1" placeholder="VD: 30"
-                               required>
-                    </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>1. Vẽ Khu vực</label>
+                    <button type="button" class="btn-save" style="width: 100%; background: #17a2b8;">+ Tạo Đa giác Mới</button>
                 </div>
-            </form>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>2. Rải Ghế vật lý</label>
+                    <input type="text" placeholder="Dãy (VD: A)" style="margin-bottom: 5px;">
+                    <input type="number" placeholder="Số ghế" style="margin-bottom: 5px;">
+                    <button type="button" class="btn-save" style="width: 100%; background: #6c757d;">⚡ Sinh chấm ghế</button>
+                </div>
+            </div>
+
+            <div style="flex: 4; background: white; border-radius: 8px; border: 2px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
+                <canvas id="masterLayoutCanvas" width="1000" height="700" style="background: #fafafa; box-shadow: 0 0 10px rgba(0,0,0,0.1);"></canvas>
+            </div>
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="cancel-location-btn">Hủy bỏ</button>
-            <button type="button" class="btn-save" id="save-location-btn">Lưu địa điểm</button>
+            <button type="button" class="btn-cancel" id="cancel-layout-btn">Đóng</button>
+            <button type="button" class="btn-save" id="save-layout-btn" style="background-color: #28a745;">💾 Lưu Master Layout</button>
         </div>
     </div>
 </div>

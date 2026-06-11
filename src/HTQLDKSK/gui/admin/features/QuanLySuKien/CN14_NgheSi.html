@@ -1,0 +1,49 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <input type="text" class="reusable-search-box" placeholder="Tìm theo tên nghệ sĩ...">
+    </div>
+    <div class="tb-right">
+        <button class="add-btn" id="btn-open-add-artist">+ Thêm Nghệ Sĩ</button>
+    </div>
+</div>
+
+<div id="artist-grid-container" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6pyth, 120px); gap: 20px; flex-grow: 1; align-content: start;">
+</div>
+
+<div class="pagination" id="artist-pagination"></div>
+
+<div id="artist-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2 id="artist-modal-title">Thêm Nghệ Sĩ Mới</h2>
+            <span class="close-modal-btn" id="close-artist-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="artistForm">
+                <input type="hidden" id="MA_NS" name="MA_NS">
+
+                <div class="form-group">
+                    <label>Tên nghệ sĩ <span class="required">*</span></label>
+                    <input type="text" id="TEN_NS" required placeholder="VD: Sơn Tùng M-TP">
+                </div>
+
+                <div class="form-group">
+                    <label>Link hình ảnh (URL)</label>
+                    <input type="text" id="IMAGE_URL" placeholder="VD: https://link-anh.com/avatar.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label>Tiểu sử ngắn</label>
+                    <textarea id="TIEU_SU" rows="4" placeholder="Nhập tóm tắt tiểu sử nghệ sĩ..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+            <button type="button" class="btn-cancel" id="delete-artist-btn" style="background-color: #ff4d4f; color: white; display: none;">🗑️ Xóa</button>
+            <div style="display: flex; gap: 15px;">
+                <button type="button" class="btn-cancel" id="cancel-artist-btn">Hủy bỏ</button>
+                <button type="button" class="btn-save" id="save-artist-btn">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>

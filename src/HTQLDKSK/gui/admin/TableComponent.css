@@ -87,14 +87,6 @@
     align-items: center;
 }
 
-.toolbar input {
-    width: 25vw;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font: normal 18px 'Merriweather', sans-serif;
-}
-
 .toolbar select {
     width: 10vw;
     padding: 8px;

@@ -2,6 +2,8 @@
     let currentLocationData = [];
     let currentLocationPage = 1;
     const rowsPerLocationPage = 10;
+    let currentEditingLocationId = null;
+    let currentMasterLayout = []; // Lưu mảng tọa độ ghế
 
     function init() {
         loadLocationDataFromAPI();
@@ -61,6 +63,14 @@
             const tdActions = document.createElement('td');
             tdActions.classList.add('actions');
 
+            const iconMap = document.createElement('img');
+            // Bạn có thể dùng tạm icon EDIT hoặc tạo file MAP.png mới
+            iconMap.src = '../img/ticket.png';
+            iconMap.alt = 'Sơ đồ';
+            iconMap.title = 'Thiết kế Sơ đồ gốc';
+            iconMap.classList.add('action-icon');
+            iconMap.addEventListener('click', () => openLayoutBuilder(dd.MA_DD, dd.TEN_DD))
+
             const iconEdit = document.createElement('img');
             iconEdit.src = '../img/EDIT.png';
             iconEdit.alt = 'Sửa';
@@ -73,7 +83,7 @@
             iconDelete.title = 'Xóa';
             iconDelete.classList.add('action-icon');
 
-            tdActions.append(iconEdit, iconDelete);
+            tdActions.append(iconMap, iconEdit, iconDelete);
             tr.append(tdId, tdName, tdAddress, tdGrid, tdActions);
             tbody.appendChild(tr);
         });
@@ -141,6 +151,137 @@
             if (event.target === modal) closeModal();
         });
     }
+
+    function openLayoutBuilder(dd) {
+        currentEditingLocationId = dd.MA_DD;
+        const modal = document.getElementById('layout-builder-modal');
+        document.getElementById('layout-location-name').textContent = dd.TEN_DD;
+        modal.style.display = 'flex';
+
+        // Khôi phục layout cũ nếu có
+        try {
+            currentMasterLayout = dd.LAYOUT_DATA ? JSON.parse(dd.LAYOUT_DATA) : [];
+        } catch(e) {
+            currentMasterLayout = [];
+        }
+        renderMasterCanvas();
+    }
+
+    function renderMasterCanvas() {
+        const canvas = document.getElementById('masterLayoutCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (currentMasterLayout.length === 0) {
+            ctx.fillStyle = '#ccc';
+            ctx.font = 'italic 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Sơ đồ trống. Vui lòng rải ghế...', canvas.width / 2, canvas.height / 2);
+            return;
+        }
+
+        // Vẽ từng ghế vật lý
+        currentMasterLayout.forEach(seat => {
+            ctx.beginPath();
+            ctx.arc(seat.x, seat.y, 14, 0, Math.PI * 2);
+            ctx.fillStyle = '#6c757d'; // Màu ghế xám chuẩn (chưa có Hạng vé)
+            ctx.fill();
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#343a40';
+            ctx.stroke();
+
+            ctx.fillStyle = 'white';
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(seat.label, seat.x, seat.y);
+        });
+    }
+
+    // Đăng ký sự kiện đóng Modal Layout
+    document.addEventListener('DOMContentLoaded', () => {
+        // Tìm nút sinh ghế trong modal (Bạn cần đặt id cho nút này trong file HTML là btn-generate-master-seats)
+        // Code HTML: <button type="button" id="btn-generate-master-seats" class="btn-save"...>
+        const btnGenSeats = document.getElementById('btn-generate-master-seats');
+        const inputs = document.querySelectorAll('#layout-builder-modal input[type="text"], #layout-builder-modal input[type="number"]');
+        let inputDay = null, inputSoGhe = null;
+
+        inputs.forEach(inp => {
+            if (inp.placeholder.includes('Dãy')) inputDay = inp;
+            if (inp.placeholder.includes('Số ghế')) inputSoGhe = inp;
+        });
+
+        if (btnGenSeats && inputDay && inputSoGhe) {
+            btnGenSeats.addEventListener('click', () => {
+                const day = inputDay.value.trim().toUpperCase();
+                const soGhe = parseInt(inputSoGhe.value);
+
+                if (!day || isNaN(soGhe)) {
+                    alert('Vui lòng nhập Dãy và Số lượng ghế!');
+                    return;
+                }
+
+                // Logic rải tọa độ nối tiếp
+                let currentTotalRows = Math.ceil(currentMasterLayout.length / 20);
+                let startY = 50 + (currentTotalRows * 40);
+
+                for (let i = 1; i <= soGhe; i++) {
+                    const x = 50 + ((i - 1) % 20) * 40;
+                    const y = startY + Math.floor((i - 1) / 20) * 40;
+
+                    currentMasterLayout.push({
+                        label: `${day}${i}`,
+                        x: x,
+                        y: y
+                    });
+                }
+
+                inputDay.value = '';
+                inputSoGhe.value = '';
+                renderMasterCanvas();
+            });
+        }
+
+        // Xử lý nút Lưu Layout
+        const btnSaveLayout = document.getElementById('save-layout-btn');
+        if (btnSaveLayout) {
+            btnSaveLayout.addEventListener('click', async () => {
+                if (!currentEditingLocationId) return;
+
+                // Tìm object địa điểm hiện tại từ state
+                const currentDD = currentLocationData.find(d => d.MA_DD === currentEditingLocationId);
+                if (!currentDD) return;
+
+                const payload = {
+                    TEN_DD: currentDD.TEN_DD,
+                    DIA_CHI: currentDD.DIA_CHI,
+                    TONG_SO_COT: currentDD.TONG_SO_COT,
+                    TONG_SO_HANG: currentDD.TONG_SO_HANG,
+                    LAYOUT_DATA: JSON.stringify(currentMasterLayout) // Đóng gói tọa độ
+                };
+
+                try {
+                    const res = await fetch(`http://localhost:8000/api/dia-diem/${currentEditingLocationId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (res.ok) {
+                        alert('Đã lưu Sơ đồ Master thành công!');
+                        document.getElementById('layout-builder-modal').style.display = 'none';
+                        loadLocationDataFromAPI(); // Refresh data
+                    } else {
+                        alert('Lưu thất bại!');
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        }
+    });
 
     // Kích hoạt
     init();

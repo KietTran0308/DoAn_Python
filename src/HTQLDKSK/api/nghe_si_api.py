@@ -53,7 +53,6 @@ def delete_nghe_si(ma_ns):
         bus.delete_nghe_si(ma_ns)
         return jsonify({"message": "Xóa nghệ sĩ thành công!"}), 200
     except ValueError as ve:
-        # Trả về lỗi 400 nếu nghệ sĩ đang nằm trong sự kiện
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
         return jsonify({"error": "Lỗi hệ thống: " + str(e)}), 500

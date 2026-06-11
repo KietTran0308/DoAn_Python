@@ -1,7 +1,6 @@
 from dao.nghe_si_dao import NgheSiDAO
 from dto.nghe_si import NgheSi
 
-
 class NgheSiBUS:
     def __init__(self, db_connection):
         self.dao = NgheSiDAO(db_connection)
@@ -30,7 +29,6 @@ class NgheSiBUS:
         try:
             return self.dao.delete(ma_ns)
         except Exception as e:
-            # Ràng buộc khóa ngoại: Không cho xóa nếu nghệ sĩ này đang có tên trong bảng `sk_ns`
             if "foreign key constraint fails" in str(e).lower():
                 raise ValueError("Không thể xóa! Nghệ sĩ này đang tham gia vào một hoặc nhiều sự kiện.")
             raise e

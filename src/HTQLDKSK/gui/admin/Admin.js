@@ -6,8 +6,8 @@ const routeMap = {
     14: 'features/QuanLySuKien/CN14_NgheSi',
 
     // Nhóm Kinh Doanh
-    21: 'features/QuanLyKinhDoanh/CN21_DonHang',
-    22: 'features/QuanLyKinhDoanh/CN22_KhachHang',
+    21: 'features/QLKD/CN21_DonHang',
+    22: 'features/QLKD/CN22_KhachHang',
 
     // Nhóm Nhân sự
     31: 'features/QuanLyNhanSu/CN31_TaiKhoan'

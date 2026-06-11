@@ -1,6 +1,6 @@
 <div class="toolbar">
     <div class="tb-left">
-        <input type="text" placeholder="Tìm theo mã, tên, số điện thoại...">
+        <input type="text" class="reusable-search-box" placeholder="Tìm theo mã, tên, số điện thoại...">
         <select>
             <option>Tất cả danh mục</option>
         </select>
@@ -22,7 +22,8 @@
             <th>Địa điểm</th>
             <th>Vé đã bán</th>
             <th>Trạng thái</th>
-            <th>Thao tác</th> </tr>
+            <th>Thao tác</th>
+        </tr>
         </tr>
         </thead>
         <tbody id="event-table-body">
@@ -167,9 +168,8 @@
                 </div>
 
                 <div id="seat-preview-container"
-                     style="flex-grow: 1; margin-top: 15px; border: 2px dashed #ccc; border-radius: 8px; padding: 15px; overflow-y: auto; background-color: #fafafa;">
-                    <h4 style="text-align: center; color: #999; margin-top: 10%;">Bản xem trước Sơ đồ Ghế sẽ hiển thị
-                        tại đây</h4>
+                     style="width: 100%; height: 500px; border: 1px solid #ccc; overflow: hidden; position: relative;">
+                    <canvas id="seatMapCanvas" width="1000" height="600"></canvas>
                 </div>
             </div>
         </div>
@@ -182,5 +182,6 @@
         </div>
     </div>
 </div>
+
 
 <div class="pagination" id="event-pagination"></div>
