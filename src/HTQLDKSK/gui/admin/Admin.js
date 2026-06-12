@@ -10,7 +10,11 @@ const routeMap = {
     22: 'features/QuanLyKinhDoanh/CN22_KhachHang',
 
     // Nhóm Nhân sự
-    31: 'features/QuanLyNhanSu/CN31_TaiKhoan'
+    31: 'features/QuanLyNhanSu/CN31_TaiKhoan',
+
+    // Nhóm Soát Vé
+    51: 'features/SoatVe/CN51_SoatVe',
+    52: 'features/SoatVe/CN51_SoatVe'
 };
 
 // =====================================================================
@@ -29,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchMenusFromAPI() {
     try {
-        const response = await fetch('http://localhost:8000/api/chuc-nang');
+        const response = await fetch('http://localhost:5000/api/chuc-nang');
         if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
         menuDataFromDB = await response.json();
 
