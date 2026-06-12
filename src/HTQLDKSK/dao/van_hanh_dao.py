@@ -11,15 +11,29 @@ class VanHanhDAO:
         result = cursor.fetchone()
         cursor.close()
         return result
+    
+    def kiem_tra_da_su_dung(self, ma_ve):
+        cursor = self.db.cursor(dictionary=True)
+        query = """
+            SELECT MA_LOG FROM check_in_log
+            WHERE MA_VE = %s AND TRANG_THAI = 1
+            LIMIT 1
+        """
+        cursor.execute(query, (ma_ve,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result is not None
 
     # Hàm ghi lại lịch sử check-in vào cổng
     def ghi_log_check_in(self, ma_ve, ma_tk_nhan_vien, trang_thai, ten_cong):
         cursor = self.db.cursor()
-        # Lưu vào bảng check_in_log với thời gian quét (NOW())
+        # Lấy MA_LOG lớn nhất hiện tại rồi +1
+        cursor.execute("SELECT COALESCE(MAX(MA_LOG), 0) + 1 FROM check_in_log")
+        ma_log = cursor.fetchone()[0]
         query = """
-            INSERT INTO check_in_log (MA_VE, MA_TK, TRANG_THAI, TG_QUET, TEN_CONG)
-            VALUES (%s, %s, %s, NOW(), %s)
+            INSERT INTO check_in_log (MA_LOG, MA_VE, MA_TK, TRANG_THAI, TG_QUET, TEN_CONG)
+            VALUES (%s, %s, %s, %s, NOW(), %s)
         """
-        cursor.execute(query, (ma_ve, ma_tk_nhan_vien, trang_thai, ten_cong))
-        self.db.commit() # Xác nhận ghi vào database
+        cursor.execute(query, (ma_log, ma_ve, ma_tk_nhan_vien, trang_thai, ten_cong))
+        self.db.commit()
         cursor.close()
