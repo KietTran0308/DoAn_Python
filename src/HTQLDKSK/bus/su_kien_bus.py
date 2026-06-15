@@ -27,3 +27,12 @@ class SuKienBUS:
         su_kien_info['danh_sach_nghe_si'] = danh_sach_nghe_si
 
         return su_kien_info
+
+    def get_seat_map(self, ma_sk):
+        # Có thể thêm các logic kiểm tra điều kiện (validate) ở đây nếu cần
+        return self.dao.get_seat_map_data(ma_sk)
+
+    def lay_danh_muc(self):
+        danh_muc = self.dao.lay_tat_ca_danh_muc()
+        # Có thể thêm các logic kiểm tra, map dữ liệu hoặc bổ sung đường dẫn ảnh gốc tại đây nếu cần
+        return danh_muc

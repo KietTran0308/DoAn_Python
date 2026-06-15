@@ -1,0 +1,101 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <search-box placeholder="Tìm theo mã CODE..."></search-box>
+        <select id="filter-loai-giam">
+            <option value="">Tất cả loại giảm</option>
+            <option value="PERCENT">Theo phần trăm (%)</option>
+            <option value="AMOUNT">Theo số tiền</option>
+        </select>
+    </div>
+    <div class="tb-right">
+        <button class="add-btn" id="btn-open-add-promo">+ Thêm Khuyến Mãi</button>
+    </div>
+</div>
+
+<div class="reusable-table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th class="col-id">Mã Code</th>
+            <th>Loại giảm</th>
+            <th>Mức giảm</th>
+            <th>Đơn hàng tối thiểu</th>
+            <th>Thời hạn áp dụng</th>
+            <th style="text-align: center;">Giới hạn (Lượt)</th>
+            <th class="col-actions">Thao tác</th>
+        </tr>
+        </thead>
+        <tbody id="promo-table-body">
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination" id="promo-pagination"></div>
+
+<div id="promo-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-header">
+            <h2 id="promo-modal-title">Thêm Mã Khuyến Mãi</h2>
+            <span class="close-modal-btn" id="close-promo-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="promoForm">
+                <input type="hidden" id="MA_GG">
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Mã Code (CODE) <span class="required">*</span></label>
+                        <input type="text" id="CODE" required placeholder="VD: SUMMER20" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Giới hạn số lượt <span class="required">*</span></label>
+                        <input type="number" id="GIOI_HAN" required placeholder="VD: 500">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Loại giảm giá <span class="required">*</span></label>
+                        <select id="LOAI_GIAM" required>
+                            <option value="PERCENT">Theo Phần trăm (%)</option>
+                            <option value="AMOUNT">Theo Số tiền mặt (VNĐ)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Giá trị giảm <span class="required">*</span></label>
+                        <input type="number" id="GIA_TRI_GIAM" required placeholder="VD: 20">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Điều kiện (Đơn hàng từ)</label>
+                        <input type="number" id="DIEU_KIEN" placeholder="VD: 100000">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Giảm tối đa (Dành cho %)</label>
+                        <input type="number" id="GIAM_TOI_DA" placeholder="VD: 50000">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Thời gian Bắt đầu <span class="required">*</span></label>
+                        <input type="datetime-local" id="TG_BAT_DAU" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Thời gian Kết thúc <span class="required">*</span></label>
+                        <input type="datetime-local" id="TG_KET_THUC" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+            <button type="button" class="btn-cancel" id="delete-promo-btn" style="background-color: #dc3545; color: white; display: none;">🗑️ Xóa</button>
+            <div style="display: flex; gap: 15px;">
+                <button type="button" class="btn-cancel" id="cancel-promo-btn">Hủy</button>
+                <button type="button" class="btn-save" id="save-promo-btn" style="background-color: #007bff;">Lưu mã giảm giá</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="toolbar" style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 20px;">
+    <div class="tb-left" style="display: flex; gap: 15px; align-items: center;">
+        <label for="role-select" style="font-weight: bold; color: #262532;">Chọn Nhóm Quyền:</label>
+        <select id="role-select" style="padding: 8px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; min-width: 250px;">
+            </select>
+    </div>
+    <div class="tb-right">
+        <button id="btn-toggle-edit" class="btn-save" style="background-color: #f39c12; color: white; padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+            <span>Sửa Phân Quyền</span>
+        </button>
+    </div>
+</div>
+
+<div class="reusable-table-container">
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th style="text-align: left; padding-left: 20px;">Chức năng hệ thống</th>
+            <th style="text-align: center; width: 120px;">Xem</th>
+            <th style="text-align: center; width: 120px;">Thêm</th>
+            <th style="text-align: center; width: 120px;">Sửa</th>
+            <th style="text-align: center; width: 120px;">Xóa</th>
+        </tr>
+        </thead>
+        <tbody id="permission-table-body">
+            </tbody>
+    </table>
+</div>
+
+<div class="pagination" id="permission-pagination" style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;"></div>

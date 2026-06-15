@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html class="dark" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>NOVAENTRY - Chọn không gian làm việc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Hanken+Grotesk:wght@400;600&display=swap" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Hanken Grotesk', sans-serif;
+            background-color: #100F1A;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(124, 204, 255, 0.2);
+            border-color: #7CCDFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="absolute top-0 right-0 w-64 h-64 bg-[#7CCDFF]/10 rounded-full blur-[120px] -z-10"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#4cd7f6]/5 rounded-full blur-[150px] -z-10"></div>
+
+    <div class="z-10 text-center w-full max-w-4xl px-4">
+        <h1 class="text-4xl font-bold mb-2">NOVA ENTRY PORTAL</h1>
+        <p id="user-greeting" class="text-gray-400 mb-10 text-lg">Đang tải dữ liệu...</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div id="btn-dashboard" class="card-hover cursor-pointer border border-gray-800 bg-gray-900/50 rounded-2xl p-10 flex flex-col items-center justify-center transition-all duration-300">
+                <div class="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-6">
+                    <span class="text-4xl">🎟️</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">Trang Đặt Vé</h2>
+                <p class="text-gray-400 text-sm">Trải nghiệm với tư cách người dùng bình thường để mua vé, xem sự kiện.</p>
+            </div>
+
+            <div id="btn-admin" class="card-hover cursor-pointer border border-gray-800 bg-gray-900/50 rounded-2xl p-10 flex flex-col items-center justify-center transition-all duration-300">
+                <div class="w-20 h-20 bg-orange-500/20 rounded-full flex items-center justify-center mb-6">
+                    <span class="text-4xl">⚙️</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-3 text-white">Hệ Thống Quản Trị</h2>
+                <p class="text-gray-400 text-sm">Truy cập vào không gian làm việc để quản lý sự kiện, vé và phân quyền.</p>
+            </div>
+        </div>
+
+        <div class="mt-12">
+            <button id="btn-logout" class="text-gray-500 hover:text-white underline text-sm transition-colors">Đăng xuất</button>
+        </div>
+    </div>
+
+    <script src="RoleSelection.js"></script>
+</body>
+</html>

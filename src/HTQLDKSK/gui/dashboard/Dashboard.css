@@ -1,0 +1,401 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* Reset cơ bản */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #100F1A;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: 15px 200px;
+    background: linear-gradient(180deg, #100F1A 0%, #1b1a29 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 10vh;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    justify-self: start;
+}
+
+.logo_text {
+    font: bold 35px 'Space Grotesk', sans-serif;
+    text-align: center;
+    background: linear-gradient(to right, #edf8ff, #7CCDFF);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.logo img{
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-right: 10px;
+}
+
+.features{
+    justify-self: center;
+}
+.features a {
+    margin: 0 20px;
+    text-decoration: none;
+    color: #C7C4D8;
+    font: bold 25px 'Space Grotesk', sans-serif;
+}
+
+/* =========================================
+   USER PROFILE DROPDOWN (Khi đã đăng nhập)
+   ========================================= */
+.user-profile-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    color: white;
+    font: bold 18px 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    position: relative;
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+.user-profile-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.user-profile-btn img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #7CCDFF;
+}
+
+/* Dropdown Menu */
+.user-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: #1b1a29;
+    min-width: 200px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    display: none; /* Ẩn mặc định */
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 2000;
+    border: 1px solid rgba(124, 204, 255, 0.2);
+}
+
+/* Hiển thị dropdown khi vùng bọc bên ngoài được hover */
+.login-container:hover .user-dropdown {
+    display: flex;
+}
+
+.user-dropdown a {
+    padding: 15px 20px;
+    color: #C7C4D8;
+    text-decoration: none;
+    font: 600 16px 'Space Grotesk', sans-serif;
+    transition: background-color 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-dropdown a:hover {
+    background-color: #262532;
+    color: white;
+}
+
+.user-dropdown .logout-btn {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ff6b6b;
+}
+
+.user-dropdown .logout-btn:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff4d4d;
+}
+
+.category_events{
+    background-color: lightsteelblue;
+    display: flex;
+    height: 8vh;
+    padding: 15px 220px;
+    gap: 40px;
+    align-items: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.category_events::-webkit-scrollbar {
+    display: none;
+}
+
+.category_item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    min-width: max-content;
+    transition: transform 0.2s ease;
+}
+
+.category_item:hover {
+    transform: translateY(-3px); /* Hiệu ứng nảy nhẹ khi di chuột */
+}
+
+.category_item span {
+    font: 20px 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+
+.login{
+    justify-self: end;
+}
+.login button {
+    justify-self: end;
+    padding: 8px 20px;
+    background-color: transparent;
+    color: white;
+    border: 1px solid #7CCDFF;
+    font: bold 20px 'Space Grotesk', sans-serif;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+/* =========================================
+   MAIN CONTENT
+   ========================================= */
+
+.content_slide {
+    height: 50vh;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.slider_container {
+    width: auto;
+    aspect-ratio: 0.8 / 2;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.slider_track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Định dạng cho thẻ <img> */
+.slide_img {
+    width: 100%; /* Bắt buộc chiếm 100% chiều rộng */
+    height: 100%; /* Bắt buộc chiếm 100% chiều cao */
+    object-fit: cover; /* Do khung và ảnh đã cùng tỷ lệ nên cover sẽ lấp đầy hoàn hảo mà KHÔNG cắt đi 1 pixel nào */
+    display: block;
+}
+
+/* Khu vực dấu chấm điều hướng */
+.slider_dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+}
+
+.dot {
+    width: 16px;
+    height: 16px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Thêm bóng đổ nhẹ để dot dễ nhìn hơn trên nền ảnh sáng */
+}
+
+.dot:hover {
+    transform: scale(1.2);
+}
+
+.dot.active {
+    background-color: #7CCDFF;
+    transform: scale(1.2);
+}
+
+.events_hints{
+    height: 50vh;
+    padding: 15px 200px;
+    background: linear-gradient(360deg, #edf8ff, rgb(138 176 246 / 0.77));
+}
+
+h3{
+    font: bold 30px 'Space Grotesk', sans-serif;
+}
+
+
+.trending_events{
+    height: 40vh;
+    padding: 15px 200px;
+}
+
+.category_dien_vien{
+    height: 30vh;
+    padding: 15px 200px;
+}
+
+.events{
+    height: auto;
+    padding: 15px 200px;
+}
+
+.events_grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 cột bằng nhau */
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.event_card {
+    background-color: #1b1a29;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.event_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(124, 204, 255, 0.2);
+}
+
+.event_card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.event_info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.event_info h4 {
+    color: #ffffff;
+    font: bold 18px 'Space Grotesk', sans-serif;
+    margin-bottom: 5px;
+}
+
+.event_info p {
+    color: #C7C4D8;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event_category {
+    color: #7CCDFF;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+/* =========================================
+   PAGINATION
+   ========================================= */
+.pagination_controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 40px;
+}
+
+.page_btn {
+    padding: 8px 16px;
+    background-color: transparent;
+    color: #C7C4D8;
+    border: 1px solid #464555;
+    border-radius: 8px;
+    cursor: pointer;
+    font: bold 16px 'Space Grotesk', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.page_btn:hover {
+    background-color: rgba(124, 204, 255, 0.1);
+    border-color: #7CCDFF;
+    color: #ffffff;
+}
+
+.page_btn.active {
+    background-color: #7CCDFF;
+    color: #100F1A;
+    border-color: #7CCDFF;
+}
+
+.page_btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =========================================
+   FOOTER
+   ========================================= */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.footer_links a {
+    display: block;
+    color: #adb5bd;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.newsletter input {
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+}
+
+.newsletter button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}

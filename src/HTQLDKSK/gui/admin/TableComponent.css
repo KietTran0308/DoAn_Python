@@ -96,13 +96,18 @@
 }
 
 .add-btn {
-    padding: 8px 15px;
-    background-color: white;
-    border: 1px solid #ccc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Khoảng cách giữa icon và chữ */
+
+    background-color: #262532; /* Hoặc màu nền hiện tại của bạn */
+    color: white;
+    border: none;
     border-radius: 4px;
+    padding: 8px 16px;
     cursor: pointer;
-    font: bold 18px 'Merriweather', sans-serif;
-    height: 40px;
+    font-weight: bold;
 }
 
 .pagination {

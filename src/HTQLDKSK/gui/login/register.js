@@ -1,5 +1,3 @@
-const API_BASE = 'http://localhost:5000';
-
 // Hiển thị thông báo
 function showMessage(msg, isError = true) {
     let el = document.getElementById('msg-box');
@@ -20,12 +18,18 @@ document.querySelector('form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const ho_ten = document.getElementById('name').value.trim();
+    const ten_tk = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
     const sdt = document.getElementById('phone').value.trim();
     const mat_khau = document.getElementById('password').value;
     const xac_nhan = document.getElementById('confirm-password').value;
     const terms = document.getElementById('terms').checked;
     const btn = this.querySelector('button[type="submit"]');
+
+    if (!ten_tk.match(/^[a-zA-Z0-9_]{3,20}$/)) {
+        showMessage('Tên đăng nhập phải từ 3-20 ký tự, không chứa ký tự đặc biệt hoặc dấu cách.');
+        return;
+    }
 
     // Validate
     if (!ho_ten || !email || !sdt || !mat_khau || !xac_nhan) {
@@ -51,13 +55,14 @@ document.querySelector('form').addEventListener('submit', async function (e) {
     const ho = parts.join(' ') || ten;
 
     // Dùng email làm tên tài khoản
-    const ten_tk = email;
+    btn.disabled = true;
+    btn.textContent = 'ĐANG XỬ LÝ...';
 
     btn.disabled = true;
     btn.textContent = 'ĐANG XỬ LÝ...';
 
     try {
-        const res = await fetch(`${API_BASE}/api/dang-ky`, {
+        const res = await fetch(`http://localhost:8000/api/dang-ky`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ten_tk, mat_khau, ho, ten, email, sdt })

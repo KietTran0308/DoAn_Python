@@ -10,13 +10,14 @@
     // Khởi chạy
     function init() {
         loadEventDataFromAPI();
+        loadLocationsForDropdown();
         setupAddEventModal();
         setupTicketBuilderEvents();
     }
 
     async function loadEventDataFromAPI() {
         try {
-            const response = await fetch('http://localhost:8000/api/events');
+            const response = await fetch('http://localhost:8000/api/su-kien');
             if (!response.ok) throw new Error("Lỗi tải API sự kiện");
             currentEventData = await response.json();
         } catch (error) {
@@ -189,6 +190,34 @@
     function setupTicketBuilderEvents() {
         const closeBuilderBtn = document.getElementById('close-builder-btn');
         const cancelBuilderBtn = document.getElementById('cancel-builder-btn');
+        const btnSaveBuilder = document.getElementById('save-builder-btn');
+        if (btnSaveBuilder) {
+            btnSaveBuilder.addEventListener('click', async () => {
+                const payload = {
+                    hang_ghe: builder_dsHangGhe,
+                    khu_vuc: builder_dsKhuVuc
+                };
+
+                try {
+                    // Sẽ cần viết thêm API method POST tương ứng ở backend để hứng cục payload này
+                    const response = await fetch(`http://localhost:8000/api/events/${currentEditingEventId}/seats`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        alert("✅ Đã lưu Cấu hình Vé và Sơ đồ thành công!");
+                        closeTicketBuilder();
+                    } else {
+                        alert("❌ Lưu thất bại!");
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            });
+        }
+
         if (closeBuilderBtn) closeBuilderBtn.addEventListener('click', closeTicketBuilder);
         if (cancelBuilderBtn) cancelBuilderBtn.addEventListener('click', closeTicketBuilder);
 
@@ -329,7 +358,6 @@
 
         try {
             // 2. Gọi API thực tế để lấy sơ đồ của Sự kiện này
-            // Lưu ý: Backend của bạn cần viết API trả về cấu trúc tương tự dữ liệu giả lập bên dưới
             const response = await fetch(`http://localhost:8000/api/events/${maSK}/seats`);
             if (!response.ok) throw new Error("Chưa có API thực tế");
             const data = await response.json();
@@ -474,75 +502,75 @@
     }
 
     function renderCanvasPreview() {
-    const canvas = document.getElementById('seatMapCanvas');
-    if (!canvas) return;
+        const canvas = document.getElementById('seatMapCanvas');
+        if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let currentYOffset = 60; // Dùng để dời tọa độ Y xuống sau mỗi khu vực
+        let currentYOffset = 60; // Dùng để dời tọa độ Y xuống sau mỗi khu vực
 
-    if (builder_dsKhuVuc.length === 0) {
-        ctx.fillStyle = '#aaa';
-        ctx.font = 'italic 16px Arial';
-        ctx.fillText('Sơ đồ trống. Vui lòng tạo khu vực và sinh ghế.', 50, 50);
-        return;
-    }
-
-    builder_dsKhuVuc.forEach(kv => {
-        // 1. In tiêu đề khu vực
-        ctx.fillStyle = '#262532';
-        ctx.font = 'bold 16px Arial';
-        ctx.textAlign = 'left';
-        const title = `📍 ${kv.TEN_KV} (${kv.LOAI_KV === 'STANDING' ? 'Khu đứng' : 'Ghế ngồi'}) - Giá: ${kv.HANG_GHE.TEN_HG}`;
-        ctx.fillText(title, 20, currentYOffset - 25);
-
-        // 2. Vẽ chi tiết tùy theo loại
-        if (kv.LOAI_KV === 'SEATING') {
-            kv.GHE_LIST.forEach((ghe, index) => {
-                const x = 40 + (index % 20) * 40; // 20 ghế 1 hàng, cách nhau 40px
-                const y = currentYOffset + Math.floor(index / 20) * 40;
-
-                // Vẽ hình tròn (Ghế)
-                ctx.beginPath();
-                ctx.arc(x, y, 14, 0, Math.PI * 2);
-                ctx.fillStyle = '#6a95b8';
-                ctx.fill();
-                ctx.lineWidth = 1;
-                ctx.strokeStyle = '#262532';
-                ctx.stroke();
-
-                // Tên ghế
-                ctx.fillStyle = 'white';
-                ctx.font = '10px Arial';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(ghe.TEN_GHE, x, y);
-            });
-
-            // Tính toán khoảng cách dời xuống cho khu vực tiếp theo
-            const totalRows = Math.ceil(kv.GHE_LIST.length / 20);
-            currentYOffset += totalRows * 40 + 60;
-
-        } else if (kv.LOAI_KV === 'STANDING') {
-            // Vẽ hộp đại diện cho Fanzone
-            ctx.fillStyle = 'rgba(243, 156, 18, 0.15)';
-            ctx.strokeStyle = '#f39c12';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 5]); // Viền đứt nét
-            ctx.strokeRect(20, currentYOffset - 10, 300, 80);
-            ctx.fillRect(20, currentYOffset - 10, 300, 80);
-            ctx.setLineDash([]); // Reset viền
-
-            ctx.fillStyle = '#d35400';
-            ctx.font = 'italic 14px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Tổng sức chứa: ${kv.SUC_CHUA} vé tự do`, 170, currentYOffset + 35);
-
-            currentYOffset += 80 + 60;
+        if (builder_dsKhuVuc.length === 0) {
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'italic 16px Arial';
+            ctx.fillText('Sơ đồ trống. Vui lòng tạo khu vực và sinh ghế.', 50, 50);
+            return;
         }
-    });
-}
+
+        builder_dsKhuVuc.forEach(kv => {
+            // 1. In tiêu đề khu vực
+            ctx.fillStyle = '#262532';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'left';
+            const title = `📍 ${kv.TEN_KV} (${kv.LOAI_KV === 'STANDING' ? 'Khu đứng' : 'Ghế ngồi'}) - Giá: ${kv.HANG_GHE.TEN_HG}`;
+            ctx.fillText(title, 20, currentYOffset - 25);
+
+            // 2. Vẽ chi tiết tùy theo loại
+            if (kv.LOAI_KV === 'SEATING') {
+                kv.GHE_LIST.forEach((ghe, index) => {
+                    const x = 40 + (index % 20) * 40; // 20 ghế 1 hàng, cách nhau 40px
+                    const y = currentYOffset + Math.floor(index / 20) * 40;
+
+                    // Vẽ hình tròn (Ghế)
+                    ctx.beginPath();
+                    ctx.arc(x, y, 14, 0, Math.PI * 2);
+                    ctx.fillStyle = '#6a95b8';
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#262532';
+                    ctx.stroke();
+
+                    // Tên ghế
+                    ctx.fillStyle = 'white';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(ghe.TEN_GHE, x, y);
+                });
+
+                // Tính toán khoảng cách dời xuống cho khu vực tiếp theo
+                const totalRows = Math.ceil(kv.GHE_LIST.length / 20);
+                currentYOffset += totalRows * 40 + 60;
+
+            } else if (kv.LOAI_KV === 'STANDING') {
+                // Vẽ hộp đại diện cho Fanzone
+                ctx.fillStyle = 'rgba(243, 156, 18, 0.15)';
+                ctx.strokeStyle = '#f39c12';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // Viền đứt nét
+                ctx.strokeRect(20, currentYOffset - 10, 300, 80);
+                ctx.fillRect(20, currentYOffset - 10, 300, 80);
+                ctx.setLineDash([]); // Reset viền
+
+                ctx.fillStyle = '#d35400';
+                ctx.font = 'italic 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`Tổng sức chứa: ${kv.SUC_CHUA} vé tự do`, 170, currentYOffset + 35);
+
+                currentYOffset += 80 + 60;
+            }
+        });
+    }
 
     // Kích hoạt
     init();

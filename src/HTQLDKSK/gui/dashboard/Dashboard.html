@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>NovaEntry - Đặt vé các sự kiện</title>
+    <link href="Dashboard.css" rel="stylesheet">
 </head>
 <body>
+<div class="header">
+    <div class="logo">
+        <img alt="logo" src="../img/LOGO.png">
+        <div class="logo_text">NOVA ENTRY</div>
+    </div>
+    <div class="features">
+        <a href="#">Trang chủ</a>
+        <a href="#">Sự kiện</a>
+        <a href="#">Tạo sự kiện</a>
+        <a href="#">Vé của tôi</a>
+    </div>
+    <div class="login-container" id="auth-container">
+        <!-- JS sẽ inject code vào đây -->
+    </div>
+</div>
 
+<div class="category_events"></div>
+
+<div class="content_slide">
+    <div class="slider_container">
+        <div class="slider_track">
+            <img src="../img/banner1.jpg" alt="Banner Khuyến mãi 1" class="slide_img">
+            <img src="../img/banner2.jpg" alt="Banner Sự kiện 2" class="slide_img">
+            <img src="../img/banner3.jpg" alt="Banner Âm nhạc 3" class="slide_img">
+            <img src="../img/banner4.jpg" alt="Banner Hội thảo 4" class="slide_img">
+            <img src="../img/banner5.jpg" alt="Banner Nghệ sĩ 5" class="slide_img">
+        </div>
+    </div>
+
+    <div class="slider_dots">
+        <div class="dot active" data-index="0"></div>
+        <div class="dot" data-index="1"></div>
+        <div class="dot" data-index="2"></div>
+        <div class="dot" data-index="3"></div>
+        <div class="dot" data-index="4"></div>
+    </div>
+</div>
+
+<div class="trending_events">
+    <h3>Sự kiện xu hướng</h3>
+</div>
+
+<div class="category_dien_vien">
+    <h3>Nghệ sĩ nổi bật</h3>
+</div>
+
+<div class="events_hints">
+    <h3>Dành riêng cho bạn</h3>
+</div>
+
+<div class="events">
+    <h3>Tất cả sự kiện</h3>
+    <div class="events_grid"></div>
+    <div class="pagination_controls"></div>
+</div>
+
+<div class="footer">
+    <div class="footer_info">
+        <h4>NovaEntry</h4>
+        <p>Hệ thống quản lý và phân phối vé sự kiện hàng đầu.</p>
+    </div>
+    <div class="footer_links">
+        <a href="#">Về chúng tôi</a>
+        <a href="#">Chính sách bảo mật</a>
+        <a href="#">Điều khoản sử dụng</a>
+    </div>
+    <div class="newsletter">
+        <h4>Nhận tin sự kiện mới</h4>
+        <input placeholder="Email của bạn" type="email">
+        <button>Đăng ký</button>
+    </div>
+</div>
+
+<script defer src="Dashboard.js"></script>
 </body>
 </html>

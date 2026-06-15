@@ -1,0 +1,101 @@
+<div class="toolbar">
+    <div class="tb-left">
+        <search-box placeholder="Tìm theo tên, username, email..."></search-box>
+        <select id="filter-role">
+            <option value="">Tất cả phòng ban / Quyền</option>
+            <option value="1">Admin (Quản trị hệ thống)</option>
+            <option value="2">Manager (Quản lý)</option>
+            <option value="3">Staff (Nhân viên)</option>
+            <option value="7">Event Organizer (Nhà tổ chức)</option>
+        </select>
+    </div>
+    <div class="tb-right">
+        <button class="add-btn" id="btn-open-add-staff">+ Thêm Nhân Sự</button>
+    </div>
+</div>
+
+<div id="staff-grid-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; flex-grow: 1; align-content: start; padding: 15px 0;">
+</div>
+
+<div class="pagination" id="staff-pagination"></div>
+
+<div id="staff-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-header">
+            <h2 id="staff-modal-title">Thêm Nhân Sự Mới</h2>
+            <span class="close-modal-btn" id="close-staff-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="staffForm">
+                <input type="hidden" id="MA_TK">
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Tên đăng nhập <span class="required">*</span></label>
+                        <input type="text" id="TEN_TK" required placeholder="VD: nguyenvan_a">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Mật khẩu <span id="pwd-req" class="required">*</span></label>
+                        <input type="password" id="MAT_KHAU" placeholder="Nhập mật khẩu (Bỏ trống nếu không đổi)">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Họ</label>
+                        <input type="text" id="HO" placeholder="VD: Nguyễn Văn">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Tên <span class="required">*</span></label>
+                        <input type="text" id="TEN" required placeholder="VD: A">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Phân quyền (Chức vụ) <span class="required">*</span></label>
+                        <select id="MA_NQ" required>
+                            <option value="1">Admin (Quản trị viên)</option>
+                            <option value="2">Manager (Quản lý)</option>
+                            <option value="3" selected>Staff (Nhân viên soát vé/hỗ trợ)</option>
+                            <option value="7">Event Organizer (Nhà tổ chức sự kiện)</option>
+                            <option value="8">Accountant (Kế toán)</option>
+                            <option value="9">Marketing (Tiếp thị)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Trạng thái</label>
+                        <select id="TRANG_THAI">
+                            <option value="1" selected>🟢 Đang hoạt động</option>
+                            <option value="0">🔴 Khóa tài khoản</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Email</label>
+                        <input type="email" id="EMAIL" placeholder="VD: a@event.com">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Số điện thoại</label>
+                        <input type="text" id="SDT" placeholder="VD: 0901234567">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Link Ảnh Đại Diện (Avatar URL)</label>
+                    <input type="text" id="AVATAR_URL" placeholder="VD: https://link-anh.com/avatar.jpg">
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+            <button type="button" class="btn-cancel" id="delete-staff-btn" style="background-color: #dc3545; color: white; display: none;">🗑️ Xóa</button>
+            <div style="display: flex; gap: 15px;">
+                <button type="button" class="btn-cancel" id="cancel-staff-btn">Hủy</button>
+                <button type="button" class="btn-save" id="save-staff-btn" style="background-color: #007bff;">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>

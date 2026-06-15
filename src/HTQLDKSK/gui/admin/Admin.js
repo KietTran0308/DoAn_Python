@@ -1,16 +1,32 @@
+const user = JSON.parse(sessionStorage.getItem('user'));
+if (!user || user.quyen === 'Customer' || user.quyen === 'VIP Customer') {
+    alert("Bạn không có quyền truy cập trang này!");
+    window.location.href = '../login/Login.html';
+}
+
 const routeMap = {
     // Nhóm Sự kiện
-    11: 'features/QuanLySuKien/CN11_SuKien',
-    12: 'features/QuanLySuKien/CN12_DiaDiem',
-    13: 'features/QuanLySuKien/CN13_DanhMuc',
-    14: 'features/QuanLySuKien/CN14_NgheSi',
+    11: 'features/QLSK/CN11_SuKien',
+    12: 'features/QLSK/CN12_DiaDiem',
+    13: 'features/QLSK/CN13_DanhMuc',
+    14: 'features/QLSK/CN14_NgheSi',
 
     // Nhóm Kinh Doanh
     21: 'features/QLKD/CN21_DonHang',
     22: 'features/QLKD/CN22_KhachHang',
+    23: 'features/QLKD/CN23_KhuyenMai',
 
     // Nhóm Nhân sự
-    31: 'features/QuanLyNhanSu/CN31_TaiKhoan'
+    31: 'features/QLNS/CN31_NhanSu',
+    32: 'features/QLNS/CN32_PhanQuyen',
+
+    // Nhóm báo cáo & thống kê
+    41: 'features/BCTK/CN41_BaoCaoDoanhThu',
+    42: 'features/BCTK/CN42_ThongKeHoatDong',
+
+    // Nhóm soát vé
+    51: 'features/SV/CN51_SoatVe',
+    52: 'features/SV/CN52_LichSuCheckin',
 };
 
 // =====================================================================
@@ -160,7 +176,7 @@ function loadTabContent(maChucNang) {
     // 5. KIỂM TRA: NẾU TAB ĐÃ TỒN TẠI (Đã tải trước đó) -> Chỉ cần hiện lên, KHÔNG fetch lại
     if (currentTab) {
         currentTab.style.display = 'flex';
-        return; // Kết thúc hàm, độ trễ = 0ms
+        return;
     }
 
     // 6. NẾU TAB CHƯA TỒN TẠI -> Tạo container mới và hiện "Đang tải..."
@@ -180,10 +196,8 @@ function loadTabContent(maChucNang) {
             return response.text();
         })
         .then(data => {
-            // Đổ HTML tĩnh vào container riêng của tab này
             currentTab.innerHTML = data;
 
-            // Chèn file JS tương ứng (thêm timestamp để tránh cache trình duyệt)
             const script = document.createElement('script');
             script.src = `${filePath}.js?t=${new Date().getTime()}`;
             document.body.appendChild(script);
