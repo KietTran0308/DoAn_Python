@@ -1,4 +1,5 @@
 import bcrypt
+import random
 from datetime import datetime
 
 from dao.tai_khoan_dao import TaiKhoanDAO
@@ -20,11 +21,16 @@ class TaiKhoanBUS:
     def _kiem_tra_mat_khau(self, password: str, hashed: str) -> bool:
         return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
 
-    # format mã hiển thị: YY + 6 số
-    @staticmethod
-    def format_ma_tk(ma_tk: int) -> str:
-        nam = datetime.now().year % 100
-        return f"{nam}{ma_tk:06d}"
+    def _generate_unique_ma_tk(self) -> int:
+        nam = datetime.now().year % 100  # Lấy 2 số cuối của năm
+        while True:
+            # Random 5 chữ số từ 10000 đến 99999
+            rand_num = random.randint(10000, 99999)
+            ma_tk = int(f"{nam}{rand_num}")
+
+            # Kiểm tra xem mã này đã tồn tại trong Database chưa
+            if not self.tai_khoan_dao.check_ma_tk_exists(ma_tk):
+                return ma_tk
 
     # đăng nhập
     def xac_thuc(self, identifier, password):
@@ -44,7 +50,8 @@ class TaiKhoanBUS:
             "message": "Đăng nhập thành công",
             "data": {
                 "ma_tk": tai_khoan["MA_TK"],
-                "ma_hien_thi": self.format_ma_tk(tai_khoan["MA_TK"]),
+                # Mã trong DB giờ đã là mã chuẩn 7 số, có thể hiển thị trực tiếp
+                "ma_hien_thi": str(tai_khoan["MA_TK"]),
                 "ten_tk": tai_khoan["TEN_TK"],
                 "quyen": tai_khoan["TEN_NQ"],
                 "ho_ten": f"{tai_khoan['HO'] or ''} {tai_khoan['TEN'] or ''}".strip()
@@ -53,7 +60,7 @@ class TaiKhoanBUS:
 
     # đăng ký
     def dang_ky(self, username, password, ho, ten, email, sdt):
-        # 1. Kiểm tra tồn tại
+        # 1. Kiểm tra tồn tại username/email
         error_msg = self.tai_khoan_dao.check_exists(username, email)
         if error_msg:
             return {"success": False, "message": error_msg}
@@ -61,9 +68,12 @@ class TaiKhoanBUS:
         # 2. Mã hóa mật khẩu
         hashed_password = self._ma_hoa_mat_khau(password)
 
-        # 3. Lưu vào Database
-        ma_tk = self.tai_khoan_dao.dang_ky_khach_hang(
-            username, hashed_password, ho, ten, email, sdt
+        # 3. Sinh mã tài khoản độc nhất
+        ma_tk = self._generate_unique_ma_tk()
+
+        # 4. Lưu vào Database bằng mã vừa sinh
+        self.tai_khoan_dao.dang_ky_khach_hang(
+            ma_tk, username, hashed_password, ho, ten, email, sdt
         )
 
         return {
@@ -71,7 +81,7 @@ class TaiKhoanBUS:
             "message": "Đăng ký thành công",
             "data": {
                 "ma_tk": ma_tk,
-                "ma_hien_thi": self.format_ma_tk(ma_tk)
+                "ma_hien_thi": str(ma_tk)
             }
         }
 

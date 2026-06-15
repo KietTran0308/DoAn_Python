@@ -32,7 +32,7 @@ class DiaDiemDAO:
 
     def getList(self):
         cursor = self.db.cursor(dictionary=True)
-        query = ("SELECT MA_DD, TEN_DD, DIA_CHI, TONG_SO_COT, TONG_SO_HANG FROM dia_diem")
+        query = ("SELECT MA_DD, TEN_DD, DIA_CHI, TONG_SO_COT, TONG_SO_HANG, LAYOUT_DATA FROM dia_diem")
         cursor.execute(query)
         result = cursor.fetchall()
         cursor.close()
@@ -61,3 +61,83 @@ class DiaDiemDAO:
         self.db.commit()
         cursor.close()
         return True
+
+    def sync_ghe_vat_ly(self, ma_dd, seat_list):
+        # Lưu ý: Bật dictionary=True để lấy dữ liệu dạng key-value
+        cursor = self.db.cursor(dictionary=True)
+        try:
+            # 1. Lấy danh sách ghế hiện tại của địa điểm này trong CSDL
+            cursor.execute("SELECT MA_GHE, DAY_GHE, SO_GHE FROM ghe_vat_ly WHERE MA_DD = %s", (ma_dd,))
+            existing_seats = cursor.fetchall()
+
+            # Tạo một cuốn từ điển (Dictionary) để tra cứu nhanh: (DAY_GHE, SO_GHE) -> MA_GHE
+            existing_dict = {(str(row['DAY_GHE']), int(row['SO_GHE'])): row['MA_GHE'] for row in existing_seats}
+
+            to_update = []
+            to_insert = []
+            processed_keys = set()
+
+            # 2. Phân loại thao tác từ danh sách ghế giao diện gửi xuống
+            for seat in seat_list:
+                day_ghe = str(seat.get('DAY_GHE'))
+                so_ghe = int(seat.get('SO_GHE'))
+                x = seat.get('x')
+                y = seat.get('y')
+                key = (day_ghe, so_ghe)
+
+                processed_keys.add(key)
+
+                if key in existing_dict:
+                    # Nếu Dãy và Số ghế đã tồn tại -> Lưu vào danh sách cần UPDATE tọa độ
+                    ma_ghe = existing_dict[key]
+                    to_update.append((x, y, ma_ghe))
+                else:
+                    # Nếu chưa tồn tại -> Lưu vào danh sách cần INSERT mới
+                    to_insert.append((ma_dd, day_ghe, so_ghe, x, y))
+
+            # 3. Tìm các ghế có trong DB nhưng bị Admin xóa khỏi Canvas
+            to_delete_ids = [existing_dict[key] for key in existing_dict if key not in processed_keys]
+
+            # 4. THỰC THI SQL HÀNG LOẠT (BULK EXECUTION)
+            if to_insert:
+                cursor.executemany("""
+                    INSERT INTO ghe_vat_ly (MA_DD, DAY_GHE, SO_GHE, TOA_DO_X, TOA_DO_Y) 
+                    VALUES (%s, %s, %s, %s, %s)
+                """, to_insert)
+
+            if to_update:
+                cursor.executemany("""
+                    UPDATE ghe_vat_ly 
+                    SET TOA_DO_X = %s, TOA_DO_Y = %s 
+                    WHERE MA_GHE = %s
+                """, to_update)
+
+            # 5. Xử lý an toàn khi XÓA
+            if to_delete_ids:
+                format_strings = ','.join(['%s'] * len(to_delete_ids))
+
+                # Kiểm tra xem những ghế định xóa có đang được map vào bảng ghe_su_kien hay không
+                cursor.execute(f"SELECT DISTINCT MA_GHE_VL FROM ghe_su_kien WHERE MA_GHE_VL IN ({format_strings})",
+                               tuple(to_delete_ids))
+                used_seats = cursor.fetchall()
+
+                if used_seats:
+                    self.db.rollback()
+                    # Bắn lỗi thân thiện lên Frontend
+                    raise ValueError(
+                        "Không thể lưu! Bạn vừa xóa một số ghế đang được sử dụng cho sự kiện. Vui lòng hoàn tác, bạn chỉ được phép dời vị trí hoặc thêm ghế mới.")
+
+                # Nếu không có ghế nào bị dính sự kiện -> An tâm xóa
+                cursor.execute(f"DELETE FROM ghe_vat_ly WHERE MA_GHE IN ({format_strings})", tuple(to_delete_ids))
+
+            self.db.commit()
+        except ValueError as ve:
+            # Bắt lỗi logic nghiệp vụ
+            self.db.rollback()
+            raise ve
+        except Exception as e:
+            # Bắt các lỗi SQL khác
+            self.db.rollback()
+            raise Exception(f"Lỗi hệ thống khi đồng bộ ghế: {str(e)}")
+        finally:
+            cursor.close()

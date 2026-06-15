@@ -1,3 +1,5 @@
+import json
+
 from dao.dia_diem_dao import DiaDiemDAO
 from dto.dia_diem import DiaDiem
 
@@ -31,11 +33,6 @@ class DiaDiemBUS:
 
         return dsDD
 
-    def get_all_dia_diem(self):
-        danh_sach_dto = self.dao.get_all()
-        # Biến mảng DTO thành mảng Dictionary để chuẩn bị ép thành JSON
-        return [dd.to_dict() for dd in danh_sach_dto]
-
     def add_dia_diem(self, data):
         if not data.get('TEN_DD') or not data.get('DIA_CHI'):
             raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
@@ -48,9 +45,24 @@ class DiaDiemBUS:
         if not data.get('TEN_DD') or not data.get('DIA_CHI'):
             raise ValueError("Tên và địa chỉ địa điểm không được để trống!")
 
-        updated_dd = DiaDiem(ma_dd, data['TEN_DD'], data['DIA_CHI'], data.get('TONG_SO_COT', 10),
-                             data.get('TONG_SO_HANG', 10), data.get('LAYOUT_DATA', None))
-        return self.dao.update(updated_dd)
+        layout_json = data.get('LAYOUT_DATA', None)
+
+        updated_dd = DiaDiem(ma_dd, data['TEN_DD'], data['DIA_CHI'],
+                             data.get('TONG_SO_COT', 10), data.get('TONG_SO_HANG', 10),
+                             layout_json)
+
+        # 1. Cập nhật thông tin trên bảng dia_diem
+        self.dao.update(updated_dd)
+
+        # 2. Xử lý bóc tách JSON và lưu vào bảng ghe_vat_ly
+        if layout_json:
+            try:
+                seat_list = json.loads(layout_json)
+                self.dao.sync_ghe_vat_ly(ma_dd, seat_list)
+            except Exception as e:
+                raise ValueError(f"Dữ liệu Layout không hợp lệ: {str(e)}")
+
+        return True
 
     def delete_dia_diem(self, ma_dd):
         try:

@@ -15,6 +15,30 @@
         setupTicketBuilderEvents();
     }
 
+    async function loadLocationsForDropdown() {
+        const selectDD = document.getElementById('MA_DD');
+        if (!selectDD) return;
+
+        try {
+            const response = await fetch('http://localhost:8000/api/dia-diem');
+            if (response.ok) {
+                const locations = await response.json();
+
+                // Xóa các option cũ, giữ lại option mặc định
+                selectDD.innerHTML = '<option value="">-- Chọn địa điểm --</option>';
+
+                locations.forEach(loc => {
+                    const option = document.createElement('option');
+                    option.value = loc.MA_DD;
+                    option.textContent = `${loc.TEN_DD} (${loc.DIA_CHI})`;
+                    selectDD.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải danh sách địa điểm cho dropdown:", error);
+        }
+    }
+
     async function loadEventDataFromAPI() {
         try {
             const response = await fetch('http://localhost:8000/api/su-kien');

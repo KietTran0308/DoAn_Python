@@ -4,11 +4,12 @@ class SuKienDAO:
 
     def lay_tat_ca_su_kien(self):
         cursor = self.db.cursor(dictionary=True)
-        # Bổ sung sk.IMAGE_URL vào câu SELECT
+        # Bổ sung sk.MA_DMSK vào câu SELECT
         sql = """
               SELECT sk.MA_SK, \
                      sk.TEN_SK, \
                      sk.IMAGE_URL, \
+                     sk.MA_DMSK, \
                      dm.TEN_DM, \
                      sk.TG_BAT_DAU, \
                      dd.TEN_DD, \

@@ -25,45 +25,54 @@
 
 <div class="pagination" id="location-pagination"></div>
 
-<div id="layout-builder-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1600px; display: flex; flex-direction: column;">
-        <div class="modal-header">
-            <h2>🗺️ Thiết kế Sơ đồ gốc: <span id="layout-location-name" style="color: #80ceff;"></span></h2>
-            <span class="close-modal-btn" id="close-layout-modal">&times;</span>
+<div id="layout-builder-fullscreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f7f6; z-index: 9999; flex-direction: column;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: #262532; color: white;">
+        <h2 style="margin: 0; font-size: 1.25rem;">🗺️ Thiết kế Sơ đồ gốc: <span id="layout-location-name" style="color: #80ceff;"></span></h2>
+        <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-cancel" id="cancel-layout-btn" style="padding: 8px 15px;">Đóng Sơ đồ</button>
+            <button type="button" class="btn-save" id="save-layout-btn" style="background-color: #28a745; padding: 8px 15px;">💾 Lưu Master Layout</button>
         </div>
+    </div>
 
-        <div class="modal-body" style="display: flex; gap: 20px; flex-grow: 1; padding: 20px; background-color: #f4f7f6; overflow: hidden;">
-            <div style="flex: 1; background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-y: auto;">
-                <h3>Công cụ thiết kế</h3>
-                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
+    <div style="display: flex; flex-grow: 1; overflow: hidden;">
 
-                <div class="form-group">
-                    <label>Tải ảnh mặt bằng (Tùy chọn)</label>
-                    <input type="file" id="upload-background" accept="image/*">
-                </div>
+        <div style="width: 320px; background: white; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 2;">
+            <h3 style="margin-top: 0;">Công cụ thiết kế</h3>
+            <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
 
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>1. Vẽ Khu vực</label>
-                    <button type="button" class="btn-save" style="width: 100%; background: #17a2b8;">+ Tạo Đa giác Mới</button>
-                </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-weight: bold; display: block; margin-bottom: 8px;">1. Tải ảnh mặt bằng (Tùy chọn)</label>
+                <input type="file" id="upload-background" accept="image/*" style="width: 100%;">
+            </div>
 
-                <div class="form-group" style="margin-top: 20px;">
-                    <label>2. Rải Ghế vật lý</label>
-                    <input type="text" placeholder="Dãy (VD: A)" style="margin-bottom: 5px;">
-                    <input type="number" placeholder="Số ghế" style="margin-bottom: 5px;">
-                    <button type="button" class="btn-save" style="width: 100%; background: #6c757d;">⚡ Sinh chấm ghế</button>
+            <div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                <label style="font-weight: bold; display: block; margin-bottom: 10px;">2. Công cụ rải ghế</label>
+                <input type="text" id="MASTER_DAY_GHE" placeholder="Dãy (VD: A)" style="margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+                <input type="number" id="MASTER_SO_GHE" placeholder="Số ghế bắt đầu (VD: 1)" style="margin-bottom: 15px; width: 100%; box-sizing: border-box;">
+                <button type="button" id="btn-generate-master-seats" class="btn-save" style="width: 100%; background: #6c757d; font-size: 1.1rem; padding: 12px;">
+                    ⚡ Kích hoạt rải ghế
+                </button>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" id="btn-undo-seat" style="flex: 1; padding: 8px; background-color: #ffc107; color: #212529; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        ↩ Hoàn tác
+                    </button>
+                    <button type="button" id="btn-clear-seats" style="flex: 1; padding: 8px; background-color: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                        🗑 Xóa hết
+                    </button>
                 </div>
             </div>
 
-            <div style="flex: 4; background: white; border-radius: 8px; border: 2px dashed #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative;">
-                <canvas id="masterLayoutCanvas" width="1000" height="700" style="background: #fafafa; box-shadow: 0 0 10px rgba(0,0,0,0.1);"></canvas>
+            <div style="font-size: 0.9rem; color: #666; font-style: italic;">
+                * Hướng dẫn: Nhập Dãy và Số bắt đầu. Kích hoạt nút, sau đó click chuột trái lên phần không gian bên phải để rải ghế. Click chuột phải để hủy chế độ rải.
             </div>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="cancel-layout-btn">Đóng</button>
-            <button type="button" class="btn-save" id="save-layout-btn" style="background-color: #28a745;">💾 Lưu Master Layout</button>
+        <div id="canvas-container" style="flex-grow: 1; background: #e9ecef; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center;">
+            <canvas id="masterLayoutCanvas" style="background: white; box-shadow: 0 0 15px rgba(0,0,0,0.1); cursor: default;"></canvas>
         </div>
+
     </div>
 </div>
 

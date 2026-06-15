@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Vé của tôi - NovaEntry</title>
+    <!-- Kế thừa CSS gốc từ Dashboard -->
+    <link href="../Dashboard.css" rel="stylesheet">
+    <!-- Icon Material -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        /* =========================================
+           CSS DÀNH RIÊNG CHO TRANG VÉ CỦA TÔI
+           ========================================= */
+        .my-tickets-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            padding: 40px 200px;
+            min-height: 70vh;
+            background-color: #100F1A;
+        }
+
+        /* Sidebar Bộ lọc */
+        .ticket-sidebar {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            height: fit-content;
+        }
+
+        .ticket-sidebar h3 {
+            font: bold 22px 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            color: #C7C4D8;
+            font: 500 16px 'Space Grotesk', sans-serif;
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .filter-btn:hover {
+            background-color: rgba(124, 204, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .filter-btn.active {
+            background-color: #7CCDFF;
+            color: #100F1A;
+            font-weight: bold;
+        }
+
+        /* Thẻ Vé (Dạng Boarding Pass) */
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .ticket-card {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            height: 180px;
+            position: relative;
+        }
+
+        .ticket-card:hover {
+            transform: translateX(10px);
+            border-color: rgba(124, 204, 255, 0.3);
+        }
+
+        /* Dấu cắt xé lề vé */
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            right: 240px; /* Cách mép phải 1 khoảng bằng khối QR */
+            width: 30px;
+            height: 30px;
+            background-color: #100F1A;
+            border-radius: 50%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 2;
+        }
+
+        .ticket-card::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 240px;
+            width: 30px;
+            height: 30px;
+            background-color: #100F1A;
+            border-radius: 50%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 2;
+        }
+
+        .ticket-image {
+            width: 250px;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ticket-info {
+            padding: 20px 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 2px dashed rgba(255, 255, 255, 0.1); /* Đường xé vé đứt nét */
+        }
+
+        .ticket-title {
+            font: bold 22px 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .ticket-meta {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            color: #C7C4D8;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .ticket-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ticket-meta-icon {
+            color: #7CCDFF;
+            font-size: 18px !important;
+        }
+
+        .ticket-qr-section {
+            width: 255px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(124, 204, 255, 0.02);
+            padding: 20px;
+            gap: 10px;
+        }
+
+        .qr-placeholder {
+            width: 100px;
+            height: 100px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #100F1A;
+        }
+
+        .ticket-status {
+            font: bold 14px 'Space Grotesk', sans-serif;
+            color: #1dd1a1;
+            background-color: rgba(29, 209, 161, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(29, 209, 161, 0.2);
+        }
+
+        .ticket-status.used {
+            color: #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='../Dashboard.html'">
+            <img alt="logo" src="../../img/LOGO.png">
+            <div class="logo_text">NOVA ENTRY</div>
+        </div>
+        <div class="features">
+            <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
+            </div>
+            <a href="#">Tạo sự kiện</a>
+            <a href="MyTickets.html" style="color: #7CCDFF;">Vé của tôi</a> <!-- Highlight trang hiện tại -->
+        </div>
+        <div class="login-container" id="auth-container"></div>
+    </div>
+
+    <!-- NỘI DUNG VÉ CỦA TÔI -->
+    <div class="my-tickets-container">
+        <!-- Sidebar Bộ lọc -->
+        <div class="ticket-sidebar">
+            <h3><span class="material-symbols-outlined" style="color: #7CCDFF;">filter_list</span> Bộ lọc vé</h3>
+            <button class="filter-btn active">
+                <span class="material-symbols-outlined">local_activity</span> Tất cả vé
+            </button>
+            <button class="filter-btn">
+                <span class="material-symbols-outlined">event_available</span> Sự kiện sắp tới
+            </button>
+            <button class="filter-btn">
+                <span class="material-symbols-outlined">history</span> Sự kiện đã tham gia
+            </button>
+        </div>
+
+        <!-- Danh sách vé -->
+        <div class="ticket-list" id="ticket-list">
+            <!-- Vé mẫu 1: Chưa sử dụng -->
+            <div class="ticket-card">
+                <img src="https://placehold.co/400x225/1b1a29/7CCDFF?text=Sky+Tour" alt="Event" class="ticket-image">
+                <div class="ticket-info">
+                    <h4 class="ticket-title">Sky Tour 2026 - M-TP Entertainment</h4>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">calendar_month</span> 15/08/2026 - 19:00</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">location_on</span> SVĐ Mỹ Đình, Hà Nội</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">airline_seat_recline_normal</span> Khu VVIP - Hàng A - Ghế 01</span>
+                    </div>
+                </div>
+                <div class="ticket-qr-section">
+                    <div class="ticket-status">Chưa sử dụng</div>
+                    <div class="qr-placeholder">
+                        <span class="material-symbols-outlined">qr_code_2</span>
+                    </div>
+                    <span style="color: #6c757d; font-size: 12px; font-weight: bold;">MÃ: TICKET-001</span>
+                </div>
+            </div>
+
+            <!-- Vé mẫu 2: Đã sử dụng -->
+            <div class="ticket-card" style="opacity: 0.7;">
+                <img src="https://placehold.co/400x225/1b1a29/7CCDFF?text=Show+Cua+Den" alt="Event" class="ticket-image">
+                <div class="ticket-info">
+                    <h4 class="ticket-title">Show Của Đen - Kỷ Niệm 10 Năm</h4>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">calendar_month</span> 10/09/2026 - 19:30</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">location_on</span> SVĐ Thống Nhất, TP.HCM</span>
+                    </div>
+                    <div class="ticket-meta">
+                        <span><span class="material-symbols-outlined ticket-meta-icon">airline_seat_recline_normal</span> Khu Đứng - GA - 012</span>
+                    </div>
+                </div>
+                <div class="ticket-qr-section">
+                    <div class="ticket-status used">Đã Check-in</div>
+                    <div class="qr-placeholder" style="background-color: #3a3947; color: #1b1a29;">
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </div>
+                    <span style="color: #6c757d; font-size: 12px; font-weight: bold;">MÃ: TICKET-002</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer_top">
+            <div class="footer_brand">
+                <div class="logo">
+                    <div class="logo_text">NOVA ENTRY</div>
+                </div>
+                <p>Hệ thống quản lý và phân phối vé sự kiện hàng đầu. Mang đến trải nghiệm tuyệt đỉnh cho cộng đồng người hâm mộ.</p>
+                <div class="social_icons">
+                    <span class="material-symbols-outlined">public</span>
+                    <span class="material-symbols-outlined">share</span>
+                    <span class="material-symbols-outlined">mail</span>
+                </div>
+            </div>
+            <div class="footer_links">
+                <h4>Khám phá</h4>
+                <a href="#">Sự kiện sắp tới</a>
+                <a href="#">Nghệ sĩ nổi bật</a>
+                <a href="#">Thể loại phổ biến</a>
+            </div>
+            <div class="footer_links">
+                <h4>Hỗ trợ</h4>
+                <a href="#">Trung tâm trợ giúp</a>
+                <a href="#">Chính sách bảo mật</a>
+                <a href="#">Điều khoản sử dụng</a>
+            </div>
+            <div class="newsletter">
+                <h4>Đăng ký nhận tin</h4>
+                <p>Nhận thông báo về các sự kiện hot nhất.</p>
+                <div class="newsletter_form">
+                    <input type="email" placeholder="Email của bạn...">
+                    <button><span class="material-symbols-outlined">send</span></button>
+                </div>
+            </div>
+        </div>
+        <div class="footer_bottom">
+            <p>&copy; 2026 NovaEntry. Đã đăng ký bản quyền.</p>
+        </div>
+    </div>
+
+    <!-- Dùng chung logic kiểm tra đăng nhập của Dashboard -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authContainer = document.getElementById('auth-container');
+            const userStr = sessionStorage.getItem('user');
+
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                const avatarUrl = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.ho_ten)}&background=random`;
+
+                authContainer.innerHTML = `
+                    <button class="user-profile-btn">
+                        <img src="${avatarUrl}" alt="User Avatar">
+                        <span>${user.ho_ten}</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <a href="#">👤 Hồ sơ cá nhân</a>
+                        <a href="#">🎟️ Quản lý vé</a>
+                        <a href="#" id="btn-logout" class="logout-btn">🚪 Đăng xuất</a>
+                    </div>
+                `;
+
+                document.getElementById('btn-logout').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    sessionStorage.removeItem('user');
+                    window.location.href = 'Dashboard.html';
+                });
+            } else {
+                // Nếu chưa đăng nhập mà cố tình vào trang này thì đá về trang Login
+                window.location.href = '../login/Login.html';
+            }
+        });
+    </script>
+</body>
+</html>

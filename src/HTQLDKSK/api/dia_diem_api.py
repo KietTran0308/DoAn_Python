@@ -10,7 +10,7 @@ def get_dia_diem():
     conn = DatabaseConnection.get_connection()
     try:
         bus = DiaDiemBUS(conn)
-        return jsonify(bus.get_all_dia_diem()), 200
+        return jsonify(bus.getList()), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:

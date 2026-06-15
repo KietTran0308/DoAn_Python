@@ -68,16 +68,24 @@ class TaiKhoanDAO:
         cursor.close()
         return None
 
-    def dang_ky_khach_hang(self, username, hashed_password, ho, ten, email, sdt):
+    def check_ma_tk_exists(self, ma_tk):
         cursor = self.db.cursor()
         try:
-            # 1. Chèn vào bảng tai_khoan
+            cursor.execute("SELECT 1 FROM tai_khoan WHERE MA_TK = %s", (ma_tk,))
+            result = cursor.fetchone()
+            return result is not None
+        finally:
+            cursor.close()
+
+    def dang_ky_khach_hang(self, ma_tk, username, hashed_password, ho, ten, email, sdt):
+        cursor = self.db.cursor()
+        try:
+            # 1. Chèn vào bảng tai_khoan với MA_TK được chỉ định
             query_tk = """
-                INSERT INTO tai_khoan (MA_NQ, TEN_TK, MAT_KHAU, TRANG_THAI)
-                VALUES (%s, %s, %s, 1)
+                INSERT INTO tai_khoan (MA_TK, MA_NQ, TEN_TK, MAT_KHAU, TRANG_THAI)
+                VALUES (%s, %s, %s, %s, 1)
             """
-            cursor.execute(query_tk, (self.MA_NQ_CUSTOMER, username, hashed_password))
-            ma_tk = cursor.lastrowid  # Lấy mã tài khoản vừa tạo
+            cursor.execute(query_tk, (ma_tk, self.MA_NQ_CUSTOMER, username, hashed_password))
 
             # 2. Chèn thông tin cá nhân vào bảng nguoi_dung
             query_nd = """
@@ -86,10 +94,10 @@ class TaiKhoanDAO:
             """
             cursor.execute(query_nd, (ma_tk, ho, ten, email, sdt))
 
-            self.db.commit()  # Xác nhận lưu cả 2 bảng thành công
+            self.db.commit()
             return ma_tk
         except Exception as e:
-            self.db.rollback()  # Nếu lỗi, hủy toàn bộ thay đổi
+            self.db.rollback()
             raise e
         finally:
             cursor.close()
