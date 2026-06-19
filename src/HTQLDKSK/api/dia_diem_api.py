@@ -23,8 +23,11 @@ def add_dia_diem():
     try:
         data = request.json
         bus = DiaDiemBUS(conn)
-        bus.add_dia_diem(data)
-        return jsonify({"message": "Thêm địa điểm thành công!"}), 201
+        ma_dd = bus.add_dia_diem(data)
+        return jsonify({
+            "message": "Thêm địa điểm thành công!",
+            "MA_DD": ma_dd
+        }), 201
     except ValueError as ve:
         return jsonify({"error": str(ve)}), 400
     except Exception as e:
