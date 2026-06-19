@@ -1,28 +1,44 @@
 (() => {
+    let allLocationData = [];
     let currentLocationData = [];
     let currentLocationPage = 1;
     const rowsPerLocationPage = 10;
+
+    let currentMasterLayout = [];
+    let isDeletingMode = false;
+
+    // --- State cho ZONE_BASED ---
+    let currentBackgroundImage = null;
+    let zonePolygons = []; // Mảng chứa các khu vực đã hoàn thành
+    let currentPolygon = []; // Mảng chứa các đỉnh đang vẽ dở
+    let isDrawingPolygon = false;
+    let isDeletingPolygonMode = false;
+
     let currentEditingLocationId = null;
-    let currentMasterLayout = []; // Lưu mảng tọa độ ghế
     let isManualDrawing = false;
     let currentDayPrefix = 'A';
-    let currentSeatNumber = 1;
-    let currentBackgroundImage = null;
+    let currentSeatNumber = 1
+    let currentFloorPlanImage = null;
+    let currentLocationType = 'FIXED_SEAT';
+    let currentCols = 0;
+    let currentRows = 0;
+
+    let currentSearchKeyword = '';
 
     function init() {
         loadLocationDataFromAPI();
-        setupAddLocationModal();
-        setupLayoutBuilderEvents();
+        setupSearch();
+        setupLocationBuilderEvents();
     }
 
     async function loadLocationDataFromAPI() {
         try {
             const response = await fetch('http://localhost:8000/api/dia-diem');
             if (!response.ok) throw new Error("Lỗi tải API địa điểm");
-            currentLocationData = await response.json();
+            allLocationData = await response.json();
         } catch (error) {
             console.error("Dùng dữ liệu SQL giả định do API lỗi:", error);
-            currentLocationData = [
+            allLocationData = [
                 { MA_DD: 1, TEN_DD: 'Sân vận động Mỹ Đình', DIA_CHI: 'Đường Lê Đức Thọ, Hà Nội', TONG_SO_COT: 50, TONG_SO_HANG: 40 },
                 { MA_DD: 2, TEN_DD: 'Nhà hát Lớn Hà Nội', DIA_CHI: '1 Tràng Tiền, Hà Nội', TONG_SO_COT: 20, TONG_SO_HANG: 15 },
                 { MA_DD: 3, TEN_DD: 'Sân vận động Thống Nhất', DIA_CHI: 'Đào Duy Từ, TP.HCM', TONG_SO_COT: 40, TONG_SO_HANG: 30 },
@@ -35,6 +51,7 @@
                 { MA_DD: 10, TEN_DD: 'Quảng trường Lâm Viên', DIA_CHI: 'Đà Lạt, Lâm Đồng', TONG_SO_COT: 100, TONG_SO_HANG: 100 }
             ];
         }
+        currentLocationData = [...allLocationData];
         currentLocationPage = 1;
         renderLocationTable();
     }
@@ -50,46 +67,16 @@
 
         pageData.forEach(dd => {
             const tr = document.createElement('tr');
-
-            const tdId = document.createElement('td');
-            const strongId = document.createElement('strong');
-            strongId.textContent = `DD${dd.MA_DD.toString().padStart(3, '0')}`;
-            tdId.appendChild(strongId);
-
-            const tdName = document.createElement('td');
-            tdName.textContent = dd.TEN_DD;
-
-            const tdAddress = document.createElement('td');
-            tdAddress.textContent = dd.DIA_CHI;
-
-            const tdGrid = document.createElement('td');
-            tdGrid.textContent = `${dd.TONG_SO_COT} x ${dd.TONG_SO_HANG}`;
-
-            const tdActions = document.createElement('td');
-            tdActions.classList.add('actions');
-
-            const iconMap = document.createElement('img');
-            // Bạn có thể dùng tạm icon EDIT hoặc tạo file MAP.png mới
-            iconMap.src = '../img/ticket.png';
-            iconMap.alt = 'Sơ đồ';
-            iconMap.title = 'Thiết kế Sơ đồ gốc';
-            iconMap.classList.add('action-icon');
-            iconMap.addEventListener('click', () => openLayoutBuilder(dd));
-
-            const iconEdit = document.createElement('img');
-            iconEdit.src = '../img/EDIT.png';
-            iconEdit.alt = 'Sửa';
-            iconEdit.title = 'Sửa';
-            iconEdit.classList.add('action-icon');
-
-            const iconDelete = document.createElement('img');
-            iconDelete.src = '../img/DELETE.png';
-            iconDelete.alt = 'Xóa';
-            iconDelete.title = 'Xóa';
-            iconDelete.classList.add('action-icon');
-
-            tdActions.append(iconMap, iconEdit, iconDelete);
-            tr.append(tdId, tdName, tdAddress, tdGrid, tdActions);
+            tr.innerHTML = `
+                <td><b>DD${dd.MA_DD.toString().padStart(3, '0')}</b></td>
+                <td><strong style="color: #262532;">${dd.TEN_DD}</strong></td>
+                <td>${dd.DIA_CHI}</td>
+                <td>${dd.TONG_SO_COT || '-'} x ${dd.TONG_SO_HANG || '-'}</td>
+                <td class="actions">
+                    <img src="/img/EDIT.png" alt="Sửa" class="action-icon">
+                    <img src="/img/DELETE.png" alt="Xóa" class="action-icon">
+                </td>
+            `;
             tbody.appendChild(tr);
         });
 
@@ -110,93 +97,94 @@
         const paginationContainer = document.getElementById('location-pagination');
         if (!paginationContainer) return;
 
-        paginationContainer.replaceChildren();
-
         const totalPages = Math.max(1, Math.ceil(currentLocationData.length / rowsPerLocationPage));
-
-        const prevSpan = document.createElement('span');
-        prevSpan.textContent = '<';
-        prevSpan.onclick = () => { if (currentLocationPage > 1) { currentLocationPage--; renderLocationTable(); } };
-        paginationContainer.appendChild(prevSpan);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageSpan = document.createElement('span');
-            pageSpan.textContent = i;
-            if (i === currentLocationPage) pageSpan.classList.add('active');
-            pageSpan.onclick = () => { currentLocationPage = i; renderLocationTable(); };
-            paginationContainer.appendChild(pageSpan);
-        }
-
-        const nextSpan = document.createElement('span');
-        nextSpan.textContent = '>';
-        nextSpan.onclick = () => { if (currentLocationPage < totalPages) { currentLocationPage++; renderLocationTable(); } };
-        paginationContainer.appendChild(nextSpan);
+        paginationContainer.setAttribute('total-pages', totalPages);
+        paginationContainer.setAttribute('current-page', currentLocationPage);
     }
 
     function setupAddLocationModal() {
-        const addBtn = document.getElementById('btn-open-add-location');
         const modal = document.getElementById('add-location-modal');
-        const closeBtn = document.getElementById('close-location-modal');
-        const cancelBtn = document.getElementById('cancel-location-btn');
-        const saveBtn = document.getElementById('save-location-btn'); // Nút lưu
+        const btnOpen = document.getElementById('btn-open-add-location');
+        const btnClose = document.getElementById('close-add-location-modal');
+        const btnCancel = document.getElementById('btn-cancel-location');
+        const btnNext = document.getElementById('btn-next-to-builder');
+        const selectType = document.getElementById('LOAI_DD');
 
-        if (!addBtn || !modal) return;
-
-        const closeModal = () => {
-            modal.style.display = 'none';
-            const form = document.getElementById('locationForm');
-            if (form) form.reset();
-        };
-
-        addBtn.addEventListener('click', () => {
+        // Mở Modal
+        btnOpen.addEventListener('click', () => {
+            document.getElementById('add-location-form').reset();
+            selectType.dispatchEvent(new Event('change')); // Đảm bảo UI update đúng form
             modal.style.display = 'flex';
         });
-        closeBtn.addEventListener('click', closeModal);
-        cancelBtn.addEventListener('click', closeModal);
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) closeModal();
+
+        // Đóng modal an toàn (Check null tránh crash)
+        if (btnClose) btnClose.addEventListener('click', () => modal.style.display = 'none');
+        if (btnCancel) btnCancel.addEventListener('click', () => modal.style.display = 'none');
+
+        selectType.addEventListener('change', (e) => {
+            currentLocationType = e.target.value;
+            if (currentLocationType === 'FIXED_SEAT') {
+                document.getElementById('config_fixed_seat').style.display = 'block';
+                document.getElementById('config_zone_based').style.display = 'none';
+            } else {
+                document.getElementById('config_fixed_seat').style.display = 'none';
+                document.getElementById('config_zone_based').style.display = 'block';
+            }
         });
 
-        // Bổ sung logic xử lý Gửi Data tạo Địa điểm
-        if (saveBtn) {
-            saveBtn.addEventListener('click', async () => {
-                const tenDD = document.getElementById('TEN_DD').value.trim();
-                const diaChi = document.getElementById('DIA_CHI').value.trim();
-                const soCot = document.getElementById('TONG_SO_COT').value;
-                const soHang = document.getElementById('TONG_SO_HANG').value;
+        btnNext.addEventListener('click', () => {
+            const tenDD = document.getElementById('TEN_DD').value;
+            if (!tenDD) return alert('Vui lòng nhập tên địa điểm!');
 
-                if (!tenDD || !diaChi) {
-                    alert('Vui lòng nhập tên và địa chỉ địa điểm!');
-                    return;
+            // Lưu cấu hình lưới không gian
+            currentCols = parseInt(document.getElementById('TONG_SO_COT').value) || 50;
+            currentRows = parseInt(document.getElementById('TONG_SO_HANG').value) || 40;
+
+            modal.style.display = 'none'; // Đóng form
+
+            // Mở Builder
+            const builder = document.getElementById('layout-builder-fullscreen');
+            builder.style.display = 'flex';
+            document.getElementById('builder-location-name').textContent = tenDD;
+
+            const canvas = document.getElementById('masterLayoutCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Tự động mở rộng canvas dựa trên thông số (mỗi ghế tốn 40px)
+            if (currentLocationType === 'FIXED_SEAT') {
+                canvas.width = Math.max(1000, currentCols * 40 + 100);
+                canvas.height = Math.max(700, currentRows * 40 + 100);
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            currentMasterLayout = [];
+            currentBackgroundImage = null;
+
+            if (currentLocationType === 'FIXED_SEAT') {
+                document.getElementById('toolbar_fixed_seat').style.display = 'flex';
+                document.getElementById('toolbar_zone_based').style.display = 'none';
+                drawGrid(ctx, canvas.width, canvas.height);
+            } else {
+                document.getElementById('toolbar_fixed_seat').style.display = 'none';
+                document.getElementById('toolbar_zone_based').style.display = 'flex';
+
+                const fileInput = document.getElementById('FLOOR_PLAN_IMG');
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = new Image();
+                        img.onload = function () {
+                            canvas.width = Math.max(1000, img.width);
+                            canvas.height = Math.max(700, img.height);
+                            currentBackgroundImage = img;
+                            renderMasterCanvas();
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
                 }
-
-                const payload = {
-                    TEN_DD: tenDD,
-                    DIA_CHI: diaChi,
-                    TONG_SO_COT: parseInt(soCot) || 50,
-                    TONG_SO_HANG: parseInt(soHang) || 40
-                };
-
-                try {
-                    const res = await fetch('http://localhost:8000/api/dia-diem', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (res.ok) {
-                        alert('✅ Thêm địa điểm thành công!');
-                        closeModal();
-                        loadLocationDataFromAPI(); // Tải lại bảng
-                    } else {
-                        const err = await res.json();
-                        alert('❌ Lỗi: ' + (err.error || 'Không thể lưu'));
-                    }
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        }
+            }
+        });
     }
 
     function openLayoutBuilder(dd) {
@@ -236,238 +224,474 @@
         const canvas = document.getElementById('masterLayoutCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 1. VẼ ẢNH NỀN (NẾU CÓ)
+        // 1. Vẽ nền
         if (currentBackgroundImage) {
-            // Vẽ ảnh full Canvas
             ctx.drawImage(currentBackgroundImage, 0, 0, canvas.width, canvas.height);
-        } else if (currentMasterLayout.length === 0) {
-            // Chỉ hiển thị text nếu không có ảnh và không có ghế
-            ctx.fillStyle = '#ccc';
-            ctx.font = 'italic 16px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('Sơ đồ trống. Tải ảnh mặt bằng và rải ghế...', canvas.width / 2, canvas.height / 2);
+        } else if (document.getElementById('LOAI_DD').value === 'FIXED_SEAT') {
+            // Vẽ lưới nếu là Fixed Seat chưa có ảnh
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= canvas.width; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+            for (let y = 0; y <= canvas.height; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
         }
 
-        // 2. VẼ CÁC CHẤM GHẾ (Giữ nguyên đoạn code cũ của bạn)
-        currentMasterLayout.forEach(seat => {
-            ctx.beginPath();
-            ctx.arc(seat.x, seat.y, 14, 0, Math.PI * 2);
-            ctx.fillStyle = '#6c757d';
-            ctx.fill();
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = '#343a40';
-            ctx.stroke();
+        // 2. Vẽ Ghế (Nếu FIXED_SEAT)
+        if (document.getElementById('LOAI_DD').value === 'FIXED_SEAT') {
+            currentMasterLayout.forEach(seat => {
+                ctx.beginPath();
+                ctx.arc(seat.x, seat.y, 14, 0, 2 * Math.PI);
+                ctx.fillStyle = '#7CCDFF'; ctx.fill();
+                ctx.lineWidth = 1; ctx.strokeStyle = '#100F1A'; ctx.stroke();
+                ctx.fillStyle = '#100F1A'; ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(seat.label, seat.x, seat.y);
+            });
+        }
 
-            ctx.fillStyle = 'white';
-            ctx.font = '10px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(seat.label, seat.x, seat.y);
-        });
+        // 3. Vẽ các Khu vực Đa giác (Nếu ZONE_BASED)
+        if (document.getElementById('LOAI_DD').value === 'ZONE_BASED') {
+            // Vẽ các vùng đã hoàn thành
+            zonePolygons.forEach(poly => {
+                ctx.beginPath();
+                ctx.moveTo(poly.points[0].x, poly.points[0].y);
+                for(let i=1; i<poly.points.length; i++) ctx.lineTo(poly.points[i].x, poly.points[i].y);
+                ctx.closePath();
+
+                ctx.fillStyle = 'rgba(155, 89, 182, 0.4)'; // Màu tím trong suốt
+                ctx.fill();
+                ctx.strokeStyle = '#8e44ad'; ctx.lineWidth = 2; ctx.stroke();
+
+                // Viết tên & sức chứa ở điểm đầu
+                ctx.fillStyle = '#100F1A';
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(`${poly.name} (${poly.capacity} người)`, poly.points[0].x, poly.points[0].y - 10);
+            });
+
+            // Vẽ vùng đang được vẽ dở (Chấm đỏ nét đứt)
+            if (currentPolygon.length > 0) {
+                ctx.beginPath();
+                ctx.moveTo(currentPolygon[0].x, currentPolygon[0].y);
+                for(let i=1; i<currentPolygon.length; i++) ctx.lineTo(currentPolygon[i].x, currentPolygon[i].y);
+
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+
+                currentPolygon.forEach(pt => {
+                    ctx.beginPath(); ctx.arc(pt.x, pt.y, 5, 0, Math.PI*2);
+                    ctx.fillStyle = '#e74c3c'; ctx.fill();
+                });
+            }
+        }
     }
 
     // Đăng ký sự kiện đóng Modal Layout
     function setupLayoutBuilderEvents() {
         const workspace = document.getElementById('layout-builder-fullscreen');
-        const cancelBtn = document.getElementById('cancel-layout-btn');
-        const btnToggleDraw = document.getElementById('btn-generate-master-seats');
-        const btnSaveLayout = document.getElementById('save-layout-btn');
+        const closeBtn = document.getElementById('close-builder-btn');
+        const saveBtn = document.getElementById('save-master-layout-btn');
+        const btnGenMatrix = document.getElementById('btn-generate-matrix');
+        const btnDeleteSeat = document.getElementById('btn-delete-seat');
         const canvas = document.getElementById('masterLayoutCanvas');
 
-        const inputDay = document.getElementById('MASTER_DAY_GHE');
-        const inputSoGhe = document.getElementById('MASTER_SO_GHE');
-        const uploadBgInput = document.getElementById('upload-background');
-
-        const btnUndo = document.getElementById('btn-undo-seat');
-        const btnClear = document.getElementById('btn-clear-seats');
-
-        if (uploadBgInput) {
-            uploadBgInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    const img = new Image();
-                    img.onload = function () {
-                        currentBackgroundImage = img;
-
-                        // Mở rộng canvas nếu ảnh nền to hơn kích thước màn hình hiện tại
-                        if (img.width > canvas.width) canvas.width = img.width;
-                        if (img.height > canvas.height) canvas.height = img.height;
-
-                        renderMasterCanvas();
-                    };
-                    img.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        if (btnUndo) {
-            btnUndo.addEventListener('click', () => {
-                if (currentMasterLayout.length > 0) {
-                    // Xóa phần tử cuối cùng khỏi mảng
-                    currentMasterLayout.pop();
-
-                    // Trả lùi số ghế lại 1 đơn vị (nếu đang > 1) để rải lại cho đúng
-                    if (currentSeatNumber > 1) {
-                        currentSeatNumber--;
-                        if (inputSoGhe) inputSoGhe.value = currentSeatNumber;
-                    }
-
-                    // Vẽ lại Canvas
-                    renderMasterCanvas();
-                }
-            });
-        }
-
-        if (btnClear) {
-            btnClear.addEventListener('click', () => {
-                if (currentMasterLayout.length === 0) return;
-                if (confirm('⚠️ Bạn có chắc chắn muốn xóa TOÀN BỘ ghế đã rải trên sơ đồ này không?')) {
-                    currentMasterLayout = []; // Xóa sạch mảng
-                    currentSeatNumber = 1; // Reset số đếm về 1
-                    if (inputSoGhe) inputSoGhe.value = currentSeatNumber;
-                    renderMasterCanvas();
-                }
-            });
-        }
-
-        // 1. Logic đóng Workspace
-        const closeLayoutWorkspace = () => {
+        // 1. Đóng Workspace
+        if (closeBtn) closeBtn.addEventListener('click', () => {
             workspace.style.display = 'none';
-            document.body.style.overflow = 'auto'; // Mở lại cuộn trang
-            currentEditingLocationId = null;
-            currentMasterLayout = [];
-            currentBackgroundImage = null;
-            if (uploadBgInput) uploadBgInput.value = '';
+            document.body.style.overflow = 'auto';
+            isDeletingMode = false;
+        });
 
-            isManualDrawing = false;
-            if (canvas) canvas.style.cursor = 'default';
-            if (btnToggleDraw) {
-                btnToggleDraw.style.background = '#6c757d';
-                btnToggleDraw.textContent = '⚡ Kích hoạt rải ghế';
-            }
-        };
+        // 2. NÚT SINH MA TRẬN TỰ ĐỘNG
+        if (btnGenMatrix) {
+            btnGenMatrix.addEventListener('click', () => {
+                if (confirm(`Hệ thống sẽ sinh tự động ${currentCols * currentRows} ghế. Ghế cũ sẽ bị xóa, bạn đồng ý chứ?`)) {
+                    currentMasterLayout = [];
+                    const startX = 40;
+                    const startY = 40;
+                    const spacing = 40;
 
-        if (cancelBtn) cancelBtn.addEventListener('click', closeLayoutWorkspace);
+                    for (let r = 0; r < currentRows; r++) {
+                        // Tính ký tự hàng: A, B, ... Z, AA, AB
+                        let rowLabel = String.fromCharCode(65 + (r % 26));
+                        if (r >= 26) rowLabel = 'A' + String.fromCharCode(65 + (r % 26));
 
-        // 2. Logic Kích hoạt/Hủy chế độ click rải ghế
-        if (btnToggleDraw) {
-            btnToggleDraw.addEventListener('click', () => {
-                isManualDrawing = !isManualDrawing;
-
-                if (isManualDrawing) {
-                    currentDayPrefix = inputDay.value.trim().toUpperCase();
-                    currentSeatNumber = parseInt(inputSoGhe.value);
-
-                    if (!currentDayPrefix || isNaN(currentSeatNumber)) {
-                        alert('Vui lòng nhập Dãy (VD: A) và Số bắt đầu (VD: 1) trước khi rải ghế!');
-                        isManualDrawing = false;
-                        return;
+                        for (let c = 0; c < currentCols; c++) {
+                            currentMasterLayout.push({
+                                label: `${rowLabel}${c + 1}`,
+                                DAY_GHE: rowLabel,
+                                SO_GHE: c + 1,
+                                x: startX + c * spacing,
+                                y: startY + r * spacing
+                            });
+                        }
                     }
-
-                    // Đổi UI báo hiệu đang rải
-                    btnToggleDraw.style.background = '#e74c3c';
-                    btnToggleDraw.textContent = '🛑 Đang rải ghế (Click để dừng)';
-                    canvas.style.cursor = 'crosshair';
-                } else {
-                    btnToggleDraw.style.background = '#6c757d';
-                    btnToggleDraw.textContent = '⚡ Kích hoạt rải ghế';
-                    canvas.style.cursor = 'default';
+                    renderMasterCanvas();
                 }
             });
         }
 
-        // 3. Logic Click chuột lên Canvas để sinh tọa độ
+        // 3. CHẾ ĐỘ CỤC TẨY (XÓA GHẾ VƯỚNG LỐI ĐI)
+        if (btnDeleteSeat) {
+            btnDeleteSeat.addEventListener('click', () => {
+                isDeletingMode = !isDeletingMode;
+                if (isDeletingMode) {
+                    btnDeleteSeat.style.background = '#ff6b6b';
+                    btnDeleteSeat.style.color = 'white';
+                    canvas.style.cursor = 'no-drop'; // Chuột hình dấu cấm
+                } else {
+                    btnDeleteSeat.style.background = 'transparent';
+                    btnDeleteSeat.style.color = '#ff6b6b';
+                    canvas.style.cursor = 'crosshair';
+                }
+            });
+        }
+
+        // 4. XỬ LÝ CLICK TRÊN CANVAS (ĐỂ XÓA)
         if (canvas) {
             canvas.addEventListener('mousedown', (e) => {
-                if (!isManualDrawing) return;
-
-                // Click chuột phải (button === 2) để hủy nhanh chế độ rải ghế
-                if (e.button === 2) {
-                    isManualDrawing = false;
-                    btnToggleDraw.style.background = '#6c757d';
-                    btnToggleDraw.textContent = '⚡ Kích hoạt rải ghế';
-                    canvas.style.cursor = 'default';
-                    return;
-                }
-
-                if (e.button !== 0) return;
+                if (!isDeletingMode || e.button !== 0) return;
 
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
-                const existingIndex = currentMasterLayout.findIndex(
-                    s => s.DAY_GHE === currentDayPrefix && s.SO_GHE === currentSeatNumber
-                );
+                // Tìm xem click có trúng cái ghế nào không (bán kính 15px)
+                const index = currentMasterLayout.findIndex(seat => {
+                    const distance = Math.sqrt(Math.pow(seat.x - x, 2) + Math.pow(seat.y - y, 2));
+                    return distance <= 15;
+                });
 
-                if (existingIndex >= 0) {
-                    // GIẢI QUYẾT VẤN ĐỀ 1 & 2: Nếu đã tồn tại -> Chỉ cập nhật tọa độ (Dời ghế)
-                    currentMasterLayout[existingIndex].x = x;
-                    currentMasterLayout[existingIndex].y = y;
+                if (index !== -1) {
+                    // TRƯỜNG HỢP 1: NẾU CLICK TRÚNG GHẾ ĐÃ CÓ -> XÓA GHẾ ĐÓ ĐI
+                    currentMasterLayout.splice(index, 1);
                 } else {
-                    // Nếu chưa tồn tại -> Thêm ghế mới
-                    currentMasterLayout.push({
-                        label: `${currentDayPrefix}${currentSeatNumber}`,
-                        DAY_GHE: currentDayPrefix,
-                        SO_GHE: currentSeatNumber,
-                        x: x,
-                        y: y
-                    });
+                    // TRƯỜNG HỢP 2: CLICK VÀO CHỖ TRỐNG -> THÊM GHẾ MỚI VÀO ĐÓ
+                    // Tự động Snap (Hít) vào tọa độ lưới gần nhất (Bội số của 40)
+                    const snapX = Math.round(x / 40) * 40;
+                    const snapY = Math.round(y / 40) * 40;
+
+                    // Ngăn việc thêm ghế sát rìa ngoài cùng (Tọa độ <= 0)
+                    if (snapX > 0 && snapY > 0) {
+                        // Tự động nội suy ra Tên Dãy và Số Ghế dựa vào tọa độ Y và X
+                        const rowIndex = Math.round((snapY - 40) / 40);
+                        let rowLabel = String.fromCharCode(65 + (rowIndex % 26));
+                        if (rowIndex >= 26) rowLabel = 'A' + String.fromCharCode(65 + (rowIndex % 26));
+
+                        const colIndex = Math.round((snapX - 40) / 40) + 1;
+
+                        // Thêm vào mảng
+                        currentMasterLayout.push({
+                            label: `${rowLabel}${colIndex}`,
+                            DAY_GHE: rowLabel,
+                            SO_GHE: colIndex,
+                            x: snapX,
+                            y: snapY
+                        });
+                    }
                 }
 
-                currentSeatNumber++;
-                if (inputSoGhe) inputSoGhe.value = currentSeatNumber;
-
+                // Vẽ lại Canvas để cập nhật hiển thị ngay lập tức
                 renderMasterCanvas();
             });
-
-            // Ngăn menu chuột phải hiện lên khi thao tác trên Canvas
-            canvas.addEventListener('contextmenu', e => e.preventDefault());
         }
 
-        // 4. Logic Lưu Master Layout
-        if (btnSaveLayout) {
-            btnSaveLayout.addEventListener('click', async () => {
-                if (!currentEditingLocationId) return;
-
-                const currentDD = currentLocationData.find(d => d.MA_DD === currentEditingLocationId);
-                if (!currentDD) return;
-
-                const payload = {
-                    TEN_DD: currentDD.TEN_DD,
-                    DIA_CHI: currentDD.DIA_CHI,
-                    TONG_SO_COT: currentDD.TONG_SO_COT,
-                    TONG_SO_HANG: currentDD.TONG_SO_HANG,
-                    LAYOUT_DATA: JSON.stringify(currentMasterLayout)
-                };
-
-                try {
-                    const res = await fetch(`http://localhost:8000/api/dia-diem/${currentEditingLocationId}`, {
-                        method: 'PUT',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (res.ok) {
-                        alert('✅ Đã lưu Sơ đồ Master thành công!');
-                        closeLayoutWorkspace();
-                        loadLocationDataFromAPI();
-                    } else {
-                        const err = await res.json();
-                        alert('❌ Lưu thất bại: ' + (err.error || ''));
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi gọi API lưu layout:", error);
-                }
+        // 5. LƯU LAYOUT XUỐNG DATABASE
+        if (saveBtn) {
+            saveBtn.addEventListener('click', async () => {
+                // Tạo payload ảo dựa vào Form lúc đầu (hoặc bạn gắn API PUT nếu đang Edit)
+                alert(`✅ Đã lưu cấu hình gồm ${currentMasterLayout.length} ghế! (Mô phỏng API)`);
+                workspace.style.display = 'none';
             });
         }
+    }
+
+    function drawGrid(ctx, width, height) {
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 1;
+        for (let x = 0; x <= width; x += 40) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+        for (let y = 0; y <= height; y += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+    }
+
+    function setupSearch() {
+        const filterCity = document.getElementById('filter-city');
+        const filterType = document.getElementById('filter-type');
+        const filterStatus = document.getElementById('filter-status');
+
+        // Hàm kiểm tra và áp dụng cả 4 tiêu chí lọc cùng lúc
+        function applyAllFilters() {
+            const cityVal = filterCity ? filterCity.value : '';
+            const typeVal = filterType ? filterType.value : '';
+            const statusVal = filterStatus ? filterStatus.value : '';
+
+            currentLocationData = allLocationData.filter(loc => {
+                // 1. Lọc theo Keyword (Thanh Search)
+                let matchKeyword = true;
+                if (currentSearchKeyword) {
+                    matchKeyword = (loc.TEN_DD && loc.TEN_DD.toLowerCase().includes(currentSearchKeyword)) ||
+                                   (loc.DIA_CHI && loc.DIA_CHI.toLowerCase().includes(currentSearchKeyword));
+                }
+
+                // 2. Lọc theo Tỉnh/Thành phố
+                let matchCity = true;
+                if (cityVal) {
+                    matchCity = loc.DIA_CHI && loc.DIA_CHI.includes(cityVal);
+                }
+
+                // 3. Lọc theo Loại hình địa điểm
+                let matchType = true;
+                if (typeVal) {
+                    // Nếu data cũ không có trường LOAI_DD, mặc định coi là FIXED_SEAT
+                    const locType = loc.LOAI_DD || 'FIXED_SEAT';
+                    matchType = (locType === typeVal);
+                }
+
+                // 4. Lọc theo Trạng thái Sơ đồ (Dựa vào LAYOUT_DATA có dữ liệu hay không)
+                let matchStatus = true;
+                if (statusVal !== '') {
+                    // Kiểm tra xem LAYOUT_DATA có hợp lệ và khác rỗng không
+                    const isConfigured = loc.LAYOUT_DATA && loc.LAYOUT_DATA !== '[]' && loc.LAYOUT_DATA !== 'null';
+
+                    if (statusVal === '1') matchStatus = isConfigured;       // Đã cấu hình
+                    if (statusVal === '0') matchStatus = !isConfigured;      // Chưa cấu hình
+                }
+
+                // Phải thỏa mãn toàn bộ các điều kiện đang chọn
+                return matchKeyword && matchCity && matchType && matchStatus;
+            });
+
+            currentLocationPage = 1;
+            renderLocationTable();
+        }
+
+        // Lắng nghe gõ phím từ Web Component
+        document.addEventListener('search-changed', (e) => {
+            currentSearchKeyword = e.detail.value.toLowerCase().trim();
+            applyAllFilters();
+        });
+
+        // Lắng nghe thay đổi từ các thẻ Select
+        if (filterCity) filterCity.addEventListener('change', applyAllFilters);
+        if (filterType) filterType.addEventListener('change', applyAllFilters);
+        if (filterStatus) filterStatus.addEventListener('change', applyAllFilters);
+
+        document.addEventListener('page-changed', (e) => {
+            if (e.target.id === 'location-pagination') {
+                currentLocationPage = e.detail.page;
+                renderLocationTable();
+            }
+        });
+    }
+
+    function setupLocationBuilderEvents() {
+        const builderScreen = document.getElementById('location-builder-fullscreen');
+        const selectType = document.getElementById('LOAI_DD');
+        const canvas = document.getElementById('masterLayoutCanvas');
+
+        // NÚT MỞ GIAO DIỆN
+        document.getElementById('btn-open-add-location')?.addEventListener('click', () => {
+            document.getElementById('add-location-form').reset();
+            currentMasterLayout = [];
+            zonePolygons = [];
+            currentPolygon = [];
+            currentBackgroundImage = null;
+            isDrawingPolygon = false;
+            isDeletingMode = false;
+            selectType.dispatchEvent(new Event('change')); // Reset UI theo dropdown
+
+            builderScreen.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            renderMasterCanvas();
+        });
+
+        // ĐÓNG GIAO DIỆN
+        document.getElementById('close-location-builder')?.addEventListener('click', () => {
+            builderScreen.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        // CHUYỂN ĐỔI LOẠI ĐỊA ĐIỂM
+        selectType.addEventListener('change', (e) => {
+            if (e.target.value === 'FIXED_SEAT') {
+                document.getElementById('tools_fixed_seat').style.display = 'block';
+                document.getElementById('tools_zone_based').style.display = 'none';
+            } else {
+                document.getElementById('tools_fixed_seat').style.display = 'none';
+                document.getElementById('tools_zone_based').style.display = 'block';
+            }
+            currentMasterLayout = [];
+            zonePolygons = [];
+            currentBackgroundImage = null;
+            renderMasterCanvas();
+        });
+
+        // TỰ ĐỘNG CẬP NHẬT TÊN LÊN HEADER
+        document.getElementById('TEN_DD').addEventListener('input', (e) => {
+            document.getElementById('preview-loc-name').textContent = e.target.value || 'Chưa đặt tên';
+        });
+
+        // ================= CÔNG CỤ FIXED_SEAT =================
+        document.getElementById('btn-generate-matrix')?.addEventListener('click', () => {
+            const cols = parseInt(document.getElementById('TONG_SO_COT').value) || 30;
+            const rows = parseInt(document.getElementById('TONG_SO_HANG').value) || 20;
+
+            canvas.width = Math.max(1000, cols * 40 + 100);
+            canvas.height = Math.max(700, rows * 40 + 100);
+            currentMasterLayout = [];
+
+            for (let r = 0; r < rows; r++) {
+                let rowLabel = String.fromCharCode(65 + (r % 26));
+                if (r >= 26) rowLabel = 'A' + String.fromCharCode(65 + (r % 26));
+                for (let c = 0; c < cols; c++) {
+                    currentMasterLayout.push({ label: `${rowLabel}${c + 1}`, x: 40 + c * 40, y: 40 + r * 40 });
+                }
+            }
+            renderMasterCanvas();
+        });
+
+        const btnToggleEdit = document.getElementById('btn-toggle-seat-edit');
+        btnToggleEdit?.addEventListener('click', () => {
+            isDeletingMode = !isDeletingMode;
+            btnToggleEdit.style.background = isDeletingMode ? '#e74c3c' : 'transparent';
+            btnToggleEdit.style.color = isDeletingMode ? 'white' : '#e74c3c';
+            btnToggleEdit.textContent = isDeletingMode ? '✅ Đang bật chế độ Sửa' : '🖍️ Bật chế độ Thêm/Xóa ghế';
+        });
+
+        // ================= CÔNG CỤ ZONE_BASED =================
+        document.getElementById('FLOOR_PLAN_IMG')?.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        canvas.width = Math.max(1000, img.width);
+                        canvas.height = Math.max(700, img.height);
+                        currentBackgroundImage = img;
+                        renderMasterCanvas();
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        const btnDrawPoly = document.getElementById('btn-draw-polygon');
+        const btnFinishPoly = document.getElementById('btn-finish-polygon');
+        const btnDelPoly = document.getElementById('btn-delete-polygon');
+
+        btnDrawPoly?.addEventListener('click', () => {
+            isDrawingPolygon = true;
+            isDeletingPolygonMode = false;
+            currentPolygon = [];
+            btnDrawPoly.style.display = 'none';
+            btnFinishPoly.style.display = 'block';
+            canvas.style.cursor = 'crosshair';
+        });
+
+        btnFinishPoly?.addEventListener('click', () => {
+            if (currentPolygon.length >= 3) {
+                const zoneName = prompt("Nhập tên cho Khu vực này (VD: Fanzone A):");
+                const capacity = prompt("Nhập sức chứa tối đa của khu vực này (Số vé):", "1000");
+                if (zoneName && capacity) {
+                    zonePolygons.push({ points: [...currentPolygon], name: zoneName, capacity: capacity });
+                }
+            } else {
+                alert("Vùng phải có ít nhất 3 điểm!");
+            }
+            isDrawingPolygon = false;
+            currentPolygon = [];
+            btnDrawPoly.style.display = 'block';
+            btnFinishPoly.style.display = 'none';
+            canvas.style.cursor = 'default';
+            renderMasterCanvas();
+        });
+
+        btnDelPoly?.addEventListener('click', () => {
+            isDeletingPolygonMode = !isDeletingPolygonMode;
+            btnDelPoly.style.background = isDeletingPolygonMode ? '#e74c3c' : 'transparent';
+            btnDelPoly.style.color = isDeletingPolygonMode ? 'white' : '#e74c3c';
+            btnDelPoly.textContent = isDeletingPolygonMode ? '✅ Đang bật Xóa vùng' : '🗑️ Bật chế độ Xóa Khu vực';
+        });
+
+        // ================= XỬ LÝ SỰ KIỆN CLICK TRÊN CANVAS =================
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const type = document.getElementById('LOAI_DD').value;
+
+            if (type === 'FIXED_SEAT' && isDeletingMode && e.button === 0) {
+                // Xóa hoặc Thêm ghế tĩnh
+                const index = currentMasterLayout.findIndex(seat => Math.sqrt(Math.pow(seat.x - x, 2) + Math.pow(seat.y - y, 2)) <= 15);
+                if (index !== -1) {
+                    currentMasterLayout.splice(index, 1);
+                } else {
+                    const snapX = Math.round(x / 40) * 40;
+                    const snapY = Math.round(y / 40) * 40;
+                    if (snapX > 0 && snapY > 0) {
+                        const rowIndex = Math.round((snapY - 40) / 40);
+                        let rowLabel = String.fromCharCode(65 + (rowIndex % 26));
+                        const colIndex = Math.round((snapX - 40) / 40) + 1;
+                        currentMasterLayout.push({ label: `${rowLabel}${colIndex}`, x: snapX, y: snapY });
+                    }
+                }
+                renderMasterCanvas();
+            }
+            else if (type === 'ZONE_BASED' && e.button === 0) {
+                if (isDrawingPolygon) {
+                    // Chấm điểm cho Polygon
+                    currentPolygon.push({x, y});
+                    renderMasterCanvas();
+                } else if (isDeletingPolygonMode) {
+                    // Kiểm tra click vào Polygon nào để xóa
+                    const ctx = canvas.getContext('2d');
+                    for (let i = zonePolygons.length - 1; i >= 0; i--) {
+                        const path = new Path2D();
+                        const pts = zonePolygons[i].points;
+                        path.moveTo(pts[0].x, pts[0].y);
+                        for(let j=1; j<pts.length; j++) path.lineTo(pts[j].x, pts[j].y);
+                        path.closePath();
+
+                        if (ctx.isPointInPath(path, x, y)) {
+                            if(confirm(`Xóa khu vực "${zonePolygons[i].name}"?`)) {
+                                zonePolygons.splice(i, 1);
+                                renderMasterCanvas();
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+        // ================= NÚT LƯU ĐỊA ĐIỂM =================
+        document.getElementById('save-location-btn')?.addEventListener('click', () => {
+            const name = document.getElementById('TEN_DD').value;
+            if (!name) return alert("Vui lòng nhập tên địa điểm!");
+
+            const payload = {
+                TEN_DD: name,
+                DIA_CHI: document.getElementById('DIA_CHI').value,
+                LOAI_DD: document.getElementById('LOAI_DD').value,
+                LAYOUT_DATA: document.getElementById('LOAI_DD').value === 'FIXED_SEAT' ? currentMasterLayout : zonePolygons
+            };
+
+            console.log("Dữ liệu gửi lên server:", payload);
+            alert(`✅ Đã lưu địa điểm "${name}" thành công!`);
+
+            builderScreen.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            loadLocationDataFromAPI(); // Refresh table
+        });
     }
 
     // Kích hoạt

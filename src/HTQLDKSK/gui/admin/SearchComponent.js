@@ -18,7 +18,7 @@ class SearchBox extends HTMLElement {
                     font: normal 18px 'Merriweather', sans-serif;
 
                     /* Tích hợp icon */
-                    background-image: url('../img/Search.png');
+                    background-image: url('../../img/Search.png');
                     background-position: 8px center;
                     background-repeat: no-repeat;
                     background-size: 30px;

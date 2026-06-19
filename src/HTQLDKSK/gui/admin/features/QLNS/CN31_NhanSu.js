@@ -1,11 +1,13 @@
 (() => {
     let currentStaffData = [];
     let currentPage = 1;
-    const cardsPerPage = 9; // Hiển thị 9 thẻ (3 cột x 3 hàng) mỗi trang
+    const cardsPerPage = 6; // Hiển thị 9 thẻ (3 cột x 3 hàng) mỗi trang
+    let currentKeyword = "";
 
     function init() {
         loadStaffDataFromAPI();
         setupStaffModal();
+        setupFilters();
     }
 
     async function loadStaffDataFromAPI() {
@@ -113,6 +115,18 @@
 
             contactDiv.append(emailEl, phoneEl);
 
+            const dateDiv = document.createElement('div');
+            dateDiv.style.cssText = "display: flex; flex-direction: column; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; font-size: 11px; color: #888;";
+
+            const createdAtEl = document.createElement('span');
+            createdAtEl.textContent = `🕒 Ngày tạo: ${ns.NGAY_TAO || 'Chưa cập nhật'}`;
+
+            const lastLoginEl = document.createElement('span');
+            lastLoginEl.textContent = `➡️ Đăng nhập cuối: ${ns.LAN_DANG_NHAP_CUOI || 'Chưa từng đăng nhập'}`;
+
+            dateDiv.append(createdAtEl, lastLoginEl);
+            contactDiv.append(dateDiv);
+
             // Gộp tất cả vào Card
             card.append(headerDiv, editBtn, badgeDiv, contactDiv);
             container.appendChild(card);
@@ -192,6 +206,12 @@
 
             pwdReq.style.display = 'none'; // Không bắt buộc nhập pass khi edit
             deleteBtn.style.display = 'block';
+
+            document.getElementById('NGAY_TAO').value = staff.NGAY_TAO || 'N/A';
+            document.getElementById('LAN_DANG_NHAP_CUOI').value = staff.LAN_DANG_NHAP_CUOI || 'N/A';
+
+            pwdReq.style.display = 'none';
+            deleteBtn.style.display = 'block';
         } else {
             title.textContent = "Thêm Nhân Sự Hệ Thống Mới";
             document.getElementById('MA_TK').value = "";
@@ -200,9 +220,48 @@
 
             pwdReq.style.display = 'inline'; // Bắt buộc nhập pass khi tạo mới
             deleteBtn.style.display = 'none';
+
+            document.getElementById('NGAY_TAO').value = 'Hệ thống tự động tạo';
+            document.getElementById('LAN_DANG_NHAP_CUOI').value = 'Chưa có dữ liệu';
+
+            pwdReq.style.display = 'inline';
+            deleteBtn.style.display = 'none';
         }
 
         modal.style.display = 'flex';
+    }
+
+    function setupFilters() {
+        const searchBox = document.getElementById('search-staff');
+        const roleFilter = document.getElementById('filter-role');
+
+        const applyFilters = () => {
+            const roleId = roleFilter ? roleFilter.value : "";
+
+            filteredStaffData = currentStaffData.filter(ns => {
+                const fullName = `${ns.HO || ''} ${ns.TEN || ''}`.toLowerCase();
+                const username = (ns.TEN_TK || '').toLowerCase();
+                const email = (ns.EMAIL || '').toLowerCase();
+
+                const matchKeyword = fullName.includes(currentKeyword) || username.includes(currentKeyword) || email.includes(currentKeyword);
+                const matchRole = roleId === "" || ns.MA_NQ.toString() === roleId;
+
+                return matchKeyword && matchRole;
+            });
+
+            currentPage = 1;
+            renderStaffGrid();
+        };
+
+        // Lắng nghe CustomEvent 'search-changed' từ Web Component
+        if (searchBox) {
+            searchBox.addEventListener('search-changed', (e) => {
+                currentKeyword = e.detail.value.toLowerCase().trim();
+                applyFilters();
+            });
+        }
+
+        if (roleFilter) roleFilter.addEventListener('change', applyFilters);
     }
 
     init();

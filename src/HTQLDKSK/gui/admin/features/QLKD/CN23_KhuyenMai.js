@@ -1,12 +1,16 @@
 (() => {
+    let allPromoData = [];
     let currentPromoData = [];
     let currentPage = 1;
     const rowsPerPage = 10;
+
+    let currentSearchKeyword = '';
 
     function init() {
         loadPromoDataFromAPI();
         setupPromoModal();
         setupDynamicFormLogic();
+        setupSearchAndFilter();
     }
 
     // Hàm tiện ích định dạng tiền tệ
@@ -24,19 +28,11 @@
         try {
             const response = await fetch('http://localhost:8000/api/khuyen-mai');
             if (!response.ok) throw new Error("Lỗi API Khuyến mãi");
-            currentPromoData = await response.json();
+            allPromoData = await response.json();
         } catch (error) {
             console.warn("Dùng dữ liệu SQL Mockup:", error);
-            // Lấy dữ liệu mockup từ SQL DUMP
-            currentPromoData = [
-                { MA_GG: 1, CODE: 'WELCOME50', LOAI_GIAM: 'PERCENT', GIA_TRI_GIAM: 50.00, DIEU_KIEN: 0.00, TG_BAT_DAU: '2026-01-01T00:00:00', TG_KET_THUC: '2026-12-31T00:00:00', GIAM_TOI_DA: 50000.00, GIOI_HAN: 100 },
-                { MA_GG: 2, CODE: 'SUMMER20', LOAI_GIAM: 'PERCENT', GIA_TRI_GIAM: 20.00, DIEU_KIEN: 100000.00, TG_BAT_DAU: '2026-06-01T00:00:00', TG_KET_THUC: '2026-08-31T00:00:00', GIAM_TOI_DA: 100000.00, GIOI_HAN: 500 },
-                { MA_GG: 3, CODE: 'VIPMINUS500K', LOAI_GIAM: 'AMOUNT', GIA_TRI_GIAM: 500000.00, DIEU_KIEN: 2000000.00, TG_BAT_DAU: '2026-01-01T00:00:00', TG_KET_THUC: '2026-12-31T00:00:00', GIAM_TOI_DA: 500000.00, GIOI_HAN: 50 },
-                { MA_GG: 4, CODE: 'HALLOWEEN', LOAI_GIAM: 'PERCENT', GIA_TRI_GIAM: 15.00, DIEU_KIEN: 0.00, TG_BAT_DAU: '2026-10-25T00:00:00', TG_KET_THUC: '2026-10-31T00:00:00', GIAM_TOI_DA: 30000.00, GIOI_HAN: 200 },
-                { MA_GG: 6, CODE: 'TET2027', LOAI_GIAM: 'AMOUNT', GIA_TRI_GIAM: 100000.00, DIEU_KIEN: 500000.00, TG_BAT_DAU: '2026-12-01T00:00:00', TG_KET_THUC: '2027-01-31T00:00:00', GIAM_TOI_DA: 100000.00, GIOI_HAN: 300 },
-                { MA_GG: 10, CODE: 'FREESHIP', LOAI_GIAM: 'AMOUNT', GIA_TRI_GIAM: 20000.00, DIEU_KIEN: 0.00, TG_BAT_DAU: '2026-01-01T00:00:00', TG_KET_THUC: '2026-12-31T00:00:00', GIAM_TOI_DA: 20000.00, GIOI_HAN: 9999 }
-            ];
         }
+        currentPromoData = [...allPromoData]; // Thêm dòng này
         currentPage = 1;
         renderPromoTable();
     }
@@ -96,12 +92,20 @@
             tdActions.classList.add('actions', 'col-actions');
 
             const iconEdit = document.createElement('img');
-            iconEdit.src = '../img/edit.png'; 
+            iconEdit.src = '/img/EDIT.png';
             iconEdit.title = 'Sửa Khuyến Mãi';
             iconEdit.classList.add('action-icon');
             iconEdit.addEventListener('click', () => openPromoModal(km));
 
+            const iconHistory = document.createElement('img');
+            iconHistory.src = '/img/HISTORY.png';
+            iconHistory.title = 'Lịch sử sử dụng';
+            iconHistory.classList.add('action-icon');
+            iconHistory.addEventListener('click', () => openPromoHistoryModal(km))
+
             tdActions.append(iconEdit);
+            tdActions.append(iconHistory);
+
             tr.append(tdCode, tdType, tdValue, tdCondition, tdDate, tdLimit, tdActions);
             tbody.appendChild(tr);
         });
@@ -213,6 +217,85 @@
 
         // Kích hoạt thủ công event change để set trạng thái ô "Giảm tối đa"
         typeSelect.dispatchEvent(new Event('change'));
+        modal.style.display = 'flex';
+    }
+
+    function setupSearchAndFilter() {
+        const filterType = document.getElementById('filter-loai-giam');
+
+        function applyAllFilters() {
+            const typeVal = filterType ? filterType.value : '';
+
+            currentPromoData = allPromoData.filter(promo => {
+                let matchKeyword = true;
+                if (currentSearchKeyword) {
+                    matchKeyword = promo.CODE.toLowerCase().includes(currentSearchKeyword);
+                }
+
+                let matchType = true;
+                if (typeVal !== '') {
+                    matchType = (promo.LOAI_GIAM === typeVal);
+                }
+
+                return matchKeyword && matchType;
+            });
+
+            currentPage = 1;
+            renderPromoTable();
+        }
+
+        // Bắt sự kiện Web Component
+        document.addEventListener('search-changed', (e) => {
+            currentSearchKeyword = e.detail.value.toLowerCase().trim();
+            applyAllFilters();
+        });
+
+        if (filterType) filterType.addEventListener('change', applyAllFilters);
+
+        document.addEventListener('page-changed', (e) => {
+            if (e.target.id === 'promo-pagination') {
+                currentPage = e.detail.page;
+                renderPromoTable();
+            }
+        });
+    }
+
+    function openPromoHistoryModal(promo) {
+        const modal = document.getElementById('promo-history-modal');
+        document.getElementById('history-promo-code').textContent = promo.CODE;
+
+        const closeBtn = document.getElementById('close-history-modal');
+        closeBtn.onclick = () => modal.style.display = 'none';
+        window.onclick = (event) => { if (event.target === modal) modal.style.display = 'none'; };
+
+        const tbody = document.getElementById('promo-history-body');
+        tbody.replaceChildren();
+
+        // MOCKUP DATA: Lấy thông tin từ bảng don_hang dựa theo Database thực tế
+        let mockHistory = [];
+        if (promo.MA_GG === 1) mockHistory = [{ MA_DH: 2, TEN_TK: 'customer_b', NGAY: '2026-05-11T11:00:00', GIAM: 50000 }];
+        else if (promo.MA_GG === 2) mockHistory = [{ MA_DH: 10, TEN_TK: 'customer_c', NGAY: '2026-06-02T10:00:00', GIAM: 100000 }];
+        else if (promo.MA_GG === 3) mockHistory = [{ MA_DH: 3, TEN_TK: 'vip_user1', NGAY: '2026-05-12T09:00:00', GIAM: 500000 }];
+        else if (promo.MA_GG === 8) mockHistory = [{ MA_DH: 7, TEN_TK: 'customer_b', NGAY: '2026-05-02T10:00:00', GIAM: 100000 }];
+        else if (promo.MA_GG === 9) mockHistory = [{ MA_DH: 6, TEN_TK: 'customer_a', NGAY: '2026-05-14T08:00:00', GIAM: 60000 }];
+
+        if (mockHistory.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #888; padding: 20px;">Mã này chưa được khách hàng nào sử dụng.</td></tr>`;
+        } else {
+            mockHistory.forEach(h => {
+                const d = new Date(h.NGAY);
+                const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #eee;"><b>ĐH${h.MA_DH.toString().padStart(5, '0')}</b></td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #eee; color: #0984e3; font-weight: 500;">@${h.TEN_TK}</td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #eee; color: #666;">${dateStr}</td>
+                        <td style="padding: 12px 15px; border-bottom: 1px solid #eee; text-align: right; color: #e74c3c; font-weight: bold;">- ${h.GIAM.toLocaleString('vi-VN')} đ</td>
+                    </tr>
+                `;
+            });
+        }
+
         modal.style.display = 'flex';
     }
 

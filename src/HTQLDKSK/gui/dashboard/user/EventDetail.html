@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chi tiết sự kiện - NovaEntry</title>
+    <!-- Kế thừa CSS gốc từ Dashboard -->
+    <link href="../Dashboard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        /* =========================================
+           CSS CHUYÊN BIỆT CHO TRANG CHI TIẾT
+           ========================================= */
+        /* Phần Hero Banner */
+        .event-hero {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            background-color: #1b1a29;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 200px;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(0deg, #100F1A 0%, rgba(16, 15, 26, 0.8) 50%, rgba(16, 15, 26, 0.4) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            gap: 40px;
+            transform: translateY(60px); /* Kéo khối này tụt xuống một chút tạo độ sâu */
+            width: 100%;
+        }
+
+        .hero-poster {
+            width: 300px;
+            height: 450px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 60px;
+            flex-grow: 1;
+        }
+
+        .hero-title {
+            font: bold 48px 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            margin: 15px 0;
+            line-height: 1.2;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            color: #C7C4D8;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-icon {
+            color: #7CCDFF;
+            font-size: 22px !important;
+        }
+
+        /* Phần Nội dung bên dưới */
+        .event-body {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 60px;
+            padding: 120px 200px 60px 200px; /* Padding top lớn do thẻ Hero bị kéo tụt xuống */
+            background-color: #100F1A;
+            min-height: 50vh;
+        }
+
+        .event-main h3 {
+            font: bold 26px 'Space Grotesk', sans-serif;
+            color: #ffffff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        .event-desc {
+            color: #C7C4D8;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 50px;
+            white-space: pre-wrap; /* Giữ nguyên các ký tự xuống dòng từ DB */
+        }
+
+        /* Lưới nghệ sĩ mini */
+        .event-artists-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 20px;
+        }
+
+        /* Thẻ Đặt vé (Cột phải) */
+        .booking-sidebar {
+            position: sticky;
+            top: 12vh; /* Dính cố định khi cuộn */
+            height: fit-content;
+        }
+
+        .booking-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(124, 204, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .booking-card h2 {
+            color: #ffffff;
+            font: bold 24px 'Space Grotesk', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(29, 209, 161, 0.15);
+            color: #1dd1a1;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            border: 1px solid rgba(29, 209, 161, 0.3);
+        }
+
+        .btn-booking {
+            width: 100%;
+            background-color: #7CCDFF;
+            color: #100F1A;
+            border: none;
+            padding: 15px 0;
+            border-radius: 12px;
+            font: bold 18px 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-booking:hover {
+            background-color: #5bb8ff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(124, 204, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='../Dashboard.html'">
+            <img alt="logo" src="../../../img/LOGO.png">
+            <div class="logo_text">NOVA ENTRY</div>
+        </div>
+        <div class="features">
+            <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Tìm kiếm sự kiện, nghệ sĩ, địa điểm...">
+            </div>
+            <a href="#">Tạo sự kiện</a>
+            <a href="MyTickets.html">Vé của tôi</a>
+        </div>
+        <div class="login-container" id="auth-container"></div>
+    </div>
+
+    <!-- HERO BANNER -->
+    <div class="event-hero" id="hero-bg">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <img id="ev-poster" class="hero-poster" src="" alt="Poster" onerror="this.src='https://placehold.co/300x450/1b1a29/7CCDFF?text=Loading'">
+            <div class="hero-info">
+                <div>
+                    <span class="event_badge" id="ev-category" style="position: static; display: inline-block;">Đang tải...</span>
+                </div>
+                <h1 class="hero-title" id="ev-title">Đang tải dữ liệu sự kiện...</h1>
+                <div class="hero-meta">
+                    <span><span class="material-symbols-outlined meta-icon">calendar_month</span> <b id="ev-time">--/--/----</b></span>
+                </div>
+                <div class="hero-meta">
+                    <span><span class="material-symbols-outlined meta-icon">location_on</span> <b id="ev-location">Đang tải địa điểm...</b></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BODY CONTENT -->
+    <div class="event-body">
+        <div class="event-main">
+            <h3>Giới thiệu sự kiện</h3>
+            <p class="event-desc" id="ev-desc">Đang tải mô tả chi tiết của sự kiện...</p>
+
+            <h3>Nghệ sĩ & Khách mời</h3>
+            <div class="event-artists-grid" id="ev-artists">
+                <!-- Danh sách nghệ sĩ sẽ được đổ bằng JS -->
+            </div>
+        </div>
+
+        <div class="booking-sidebar">
+            <div class="booking-card">
+                <h2>Thông tin Vé</h2>
+                <span class="status-badge" id="ev-status">Đang mở bán</span>
+                <p style="color: #C7C4D8; font-size: 14px; margin-bottom: 25px; line-height: 1.5;">
+                    Vui lòng chuẩn bị sẵn tài khoản ngân hàng hoặc ví điện tử. Giao dịch cần được hoàn tất trong vòng 10 phút.
+                </p>
+                <button class="btn-booking" id="btn-book">
+                    <span class="material-symbols-outlined">local_activity</span>
+                    Mua vé ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer_bottom" style="border: none;">
+            <p>&copy; 2026 NovaEntry. Đã đăng ký bản quyền.</p>
+        </div>
+    </div>
+    <script defer src="EventDetail.js"></script>
+</body>
+</html>

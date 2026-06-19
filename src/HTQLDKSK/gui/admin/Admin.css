@@ -20,6 +20,7 @@
 /* Sidebar (Div 2) */
 .sidebar {
     width: 300px;
+    flex-shrink: 0;
     background: linear-gradient(135deg, #100F1A 0%, #161524 100%);
     color: white;
     display: flex;
@@ -106,14 +107,22 @@
 }
 
 /* Tabs (Div 3.1) */
-.top-tabs {
+.top-bar {
     background-color: #11101C;
-    color: rgb(255 255 255 / 0.57);
     display: flex;
-    gap: 60px;
+    justify-content: space-between; /* Đẩy top-tabs sang trái, avatar sang phải */
+    align-items: center;
     border-radius: 0px 0px 0px 10px;
     height: 6vh;
-    padding: 15px;
+    padding: 0 25px;
+}
+
+.top-tabs {
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    height: 100%;
+    color: rgb(255 255 255 / 0.57);
 }
 
 .tab {
@@ -133,5 +142,104 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     border-radius: 10px 0px 0px 0px;
+}
+
+.user-profile {
+    position: relative;
+}
+
+.avatar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 5px 12px;
+    border-radius: 30px;
+    transition: background 0.2s;
+}
+
+.avatar-wrapper:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#header-user-name {
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#header-avatar-img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #80ceff;
+    object-fit: cover;
+}
+
+.profile-dropdown {
+    display: none; /* Mặc định ẩn */
+    position: absolute;
+    top: 55px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    width: 230px;
+    z-index: 1000;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.profile-header {
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+#dropdown-name {
+    color: #262532;
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+#dropdown-role {
+    color: #888;
+    font-size: 13px;
+    font-style: italic;
+}
+
+.profile-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-menu li {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    color: #333;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.profile-menu li:hover {
+    background: #f0f0f0;
+}
+
+.profile-menu li.logout {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.profile-menu li.logout:hover {
+    background: #ffebeb;
 }

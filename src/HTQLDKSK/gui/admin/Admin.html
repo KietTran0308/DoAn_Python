@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="TableComponent.css">
 
     <script src="SearchComponent.js"></script>
+    <script src="../PaginationComponent.js"></script>
 </head>
 <body>
     <div class="admin">
@@ -23,7 +24,26 @@
         </div>
 
         <div class="main-container">
-            <div class="top-tabs"> </div>
+            <div class="top-bar">
+                <div class="top-tabs"> </div>
+
+                <div class="user-profile">
+                    <div class="avatar-wrapper" id="avatar-btn">
+                        <span id="header-user-name">Đang tải...</span>
+                        <img id="header-avatar-img" src="" alt="Avatar">
+                    </div>
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-header">
+                            <b id="dropdown-name">Đang tải...</b>
+                            <small id="dropdown-role">...</small>
+                        </div>
+                        <ul class="profile-menu">
+                            <li>⚙️ Cài đặt tài khoản</li>
+                            <li id="logout-btn" class="logout">🚪 Đăng xuất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div id="content-area"> </div>
         </div>
     </div>

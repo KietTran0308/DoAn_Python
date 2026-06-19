@@ -1,124 +1,134 @@
 (() => {
     let currentCategoryData = [];
+    let allCategoryData = [];
     let currentPage = 1;
-    const rowsPerPage = 10;
+    const rowsPerPage = 8;
 
     function init() {
         loadCategoryDataFromAPI();
         setupCategoryModal();
+        setupSearch();
     }
 
     async function loadCategoryDataFromAPI() {
         try {
             const response = await fetch('http://localhost:8000/api/danh-muc');
             if (!response.ok) throw new Error("Lỗi API");
-            currentCategoryData = await response.json();
+            allCategoryData = await response.json();
         } catch (error) {
             console.error("Lỗi:", error);
-            // Fallback tĩnh (nếu API chưa chạy)
-            currentCategoryData = [
+            allCategoryData = [
                 { MA_DMSK: 1, TEN_DM: 'Âm nhạc', IMAGE_URL: 'url/music.jpg', SO_LUONG_SK: 3 },
                 { MA_DMSK: 2, TEN_DM: 'Thể thao', IMAGE_URL: 'url/sports.jpg', SO_LUONG_SK: 1 },
                 { MA_DMSK: 3, TEN_DM: 'Hội thảo Công nghệ', IMAGE_URL: 'url/tech.jpg', SO_LUONG_SK: 1 }
             ];
         }
+        currentCategoryData = [...allCategoryData];
         currentPage = 1;
-        renderCategoryTable();
+        renderCategoryGrid();
     }
 
-    function renderCategoryTable() {
-        const tbody = document.getElementById('category-table-body');
-        if (!tbody) return;
-        tbody.replaceChildren();
+    function renderCategoryGrid() {
+        const container = document.getElementById('category-grid-container');
+        if (!container) return;
+
+        container.replaceChildren();
 
         const startIndex = (currentPage - 1) * rowsPerPage;
         const pageData = currentCategoryData.slice(startIndex, startIndex + rowsPerPage);
 
+        if (pageData.length === 0) {
+            container.innerHTML = `<div style="grid-column: span 4; text-align: center; color: #888; margin-top: 50px; font-size: 18px;">Không tìm thấy danh mục nào.</div>`;
+            renderPagination();
+            return;
+        }
+
         pageData.forEach(dm => {
-            const tr = document.createElement('tr');
+            const card = document.createElement('div');
 
-            // Mã DM
-            const tdId = document.createElement('td');
-            tdId.classList.add('col-id');
-            const strongId = document.createElement('strong');
-            strongId.textContent = `DM${dm.MA_DMSK.toString().padStart(3, '0')}`;
-            tdId.appendChild(strongId);
+            const imgUrl = (dm.IMAGE_URL)
+                ? dm.IMAGE_URL
+                : `https://placehold.co/400x200/262532/7CCDFF?text=${encodeURIComponent(dm.TEN_DM)}`;
 
-            // Hình ảnh (Thumbnail)
-            const tdImage = document.createElement('td');
-            tdImage.style.textAlign = 'center';
-            const img = document.createElement('img');
-            // Dùng ảnh placeholder nếu URL không hợp lệ
-            img.src = dm.IMAGE_URL.startsWith('http') ? dm.IMAGE_URL : 'https://via.placeholder.com/60x40?text=No+Image';
-            img.style.cssText = "width: 60px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;";
-            tdImage.appendChild(img);
+            card.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+                display: flex;
+                flex-direction: column;
+                transition: all 0.3s ease;
+                border: 1px solid #eee;
+            `;
 
-            // Tên DM
-            const tdName = document.createElement('td');
-            tdName.textContent = dm.TEN_DM;
+            card.onmouseenter = () => {
+                card.style.transform = 'translateY(-8px)';
+                card.style.boxShadow = '0 12px 25px rgba(0,0,0,0.15)';
+                card.style.borderColor = '#7CCDFF';
+            };
+            card.onmouseleave = () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 4px 15px rgba(0,0,0,0.05)';
+                card.style.borderColor = '#eee';
+            };
 
-            // Số lượng sự kiện
-            const tdCount = document.createElement('td');
-            tdCount.style.textAlign = 'center';
-            const badge = document.createElement('span');
-            badge.style.cssText = "background: #6a95b8; color: white; padding: 4px 10px; border-radius: 12px; font-size: 14px; font-weight: bold;";
-            badge.textContent = dm.SO_LUONG_SK;
-            tdCount.appendChild(badge);
+            card.innerHTML = `
+                <div style="height: 200px; width: 100%; background-image: url('${imgUrl}'); background-size: cover; background-position: center; border-bottom: 3px solid #7CCDFF;">
+                </div>
+                
+                <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+                    <h3 style="margin: 0 0 10px 0; color: #262532; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${dm.TEN_DM}">
+                        ${dm.TEN_DM}
+                    </h3>
+                    <p style="margin: 0 0 20px 0; color: #666; font-size: 14px; display: flex; align-items: center; gap: 5px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: #f39c12;"></span>
+                        Đang có: <b style="color: #1dd1a1; font-size: 16px;">${dm.SO_LUONG_SK || 0}</b> sự kiện
+                    </p>
+                    
+                    <div style="margin-top: auto; display: flex; justify-content: flex-end; gap: 15px; border-top: 1px dashed #ddd; padding-top: 15px;">
+                        <img src="/img/EDIT.png" alt="Sửa" title="Chỉnh sửa danh mục" style="width: 30px; height: 30px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="/img/DELETE.png" alt="Xóa" title="Xóa danh mục" style="width: 30px; height: 30px; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', (e) => {
+                // Nếu người dùng bấm vào icon Sửa/Xóa thì KHÔNG chuyển trang
+                if (e.target.tagName.toLowerCase() === 'img') return;
 
-            // Thao tác
-            const tdActions = document.createElement('td');
-            tdActions.classList.add('actions', 'col-actions');
+                // 1. Lưu từ khóa Danh mục vào SessionStorage
+                sessionStorage.setItem('pendingCategoryFilter', dm.TEN_DM);
 
-            const iconEdit = document.createElement('img');
-            iconEdit.src = '../img/EDIT.png';
-            iconEdit.classList.add('action-icon');
+                // 2. Chuyển sang Tab Sự kiện (Mã 11) bằng hàm global của Admin.js
+                if (typeof window.loadTabContent === 'function') {
+                    window.loadTabContent(11);
 
-            const iconDelete = document.createElement('img');
-            iconDelete.src = '../img/DELETE.png';
-            iconDelete.classList.add('action-icon');
+                    // Đổi trạng thái hiển thị của thanh Tab ngang trên cùng
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-tab'));
+                    const tabs = document.querySelectorAll('.tab');
+                    for (let t of tabs) {
+                        if (t.textContent.toLowerCase().includes('sự kiện')) {
+                            t.classList.add('active-tab');
+                            break;
+                        }
+                    }
+                }
 
-            tdActions.append(iconEdit, iconDelete);
-            tr.append(tdId, tdImage, tdName, tdCount, tdActions);
-            tbody.appendChild(tr);
+                // 3. Kích hoạt Event (Dành cho trường hợp tab Sự kiện đã tải từ trước và đang ẩn)
+                document.dispatchEvent(new CustomEvent('trigger-category-filter', { detail: dm.TEN_DM }));
+            });
+            container.appendChild(card);
         });
 
-        // Độn hàng
-        for (let i = 0; i < (rowsPerPage - pageData.length); i++) {
-            const emptyTr = document.createElement('tr');
-            for (let j = 0; j < 5; j++) {
-                const td = document.createElement('td');
-                if (j === 0) td.textContent = '\u00A0';
-                emptyTr.appendChild(td);
-            }
-            tbody.appendChild(emptyTr);
-        }
-        renderCategoryPagination();
+        renderPagination();
     }
 
-    function renderCategoryPagination() {
+    function renderPagination() {
         const paginationContainer = document.getElementById('category-pagination');
         if (!paginationContainer) return;
-        paginationContainer.replaceChildren();
 
         const totalPages = Math.max(1, Math.ceil(currentCategoryData.length / rowsPerPage));
-        // Logic sinh nút phân trang... (Giống CN12)
-        const prevSpan = document.createElement('span');
-        prevSpan.textContent = '<';
-        prevSpan.onclick = () => { if (currentPage > 1) { currentPage--; renderCategoryTable(); } };
-        paginationContainer.appendChild(prevSpan);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageSpan = document.createElement('span');
-            pageSpan.textContent = i;
-            if (i === currentPage) pageSpan.classList.add('active');
-            pageSpan.onclick = () => { currentPage = i; renderCategoryTable(); };
-            paginationContainer.appendChild(pageSpan);
-        }
-
-        const nextSpan = document.createElement('span');
-        nextSpan.textContent = '>';
-        nextSpan.onclick = () => { if (currentPage < totalPages) { currentPage++; renderCategoryTable(); } };
-        paginationContainer.appendChild(nextSpan);
+        paginationContainer.setAttribute('total-pages', totalPages);
+        paginationContainer.setAttribute('current-page', currentPage);
     }
 
     function setupCategoryModal() {
@@ -130,6 +140,7 @@
         if (!addBtn || !modal) return;
 
         addBtn.addEventListener('click', () => { modal.style.display = 'flex'; });
+
         const closeModal = () => {
             modal.style.display = 'none';
             const form = document.getElementById('categoryForm');
@@ -139,6 +150,29 @@
         closeBtn.addEventListener('click', closeModal);
         cancelBtn.addEventListener('click', closeModal);
         window.addEventListener('click', (event) => { if (event.target === modal) closeModal(); });
+    }
+
+    function setupSearch() {
+        document.addEventListener('search-changed', (e) => {
+            const keyword = e.detail.value.toLowerCase().trim();
+
+            if (!keyword) {
+                currentCategoryData = [...allCategoryData];
+            } else {
+                currentCategoryData = allCategoryData.filter(dm =>
+                    (dm.TEN_DM && dm.TEN_DM.toLowerCase().includes(keyword)) ||
+                    (dm.MA_DMSK && dm.MA_DMSK.toString().includes(keyword))
+                );
+            }
+            currentPage = 1;
+            renderCategoryGrid();
+        });
+        document.addEventListener('page-changed', (e) => {
+            if (e.target.id === 'category-pagination') {
+                currentPage = e.detail.page;
+                renderCategoryGrid();
+            }
+        });
     }
 
     init();

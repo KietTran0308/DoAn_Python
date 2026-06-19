@@ -45,12 +45,14 @@ class TaiKhoanBUS:
         if not self._kiem_tra_mat_khau(password, tai_khoan["MAT_KHAU"]):
             return {"success": False, "message": "Mật khẩu không chính xác!"}
 
+        # GỌI DAO ĐỂ CẬP NHẬT LẦN ĐĂNG NHẬP CUỐI KHI ĐĂNG NHẬP THÀNH CÔNG
+        self.tai_khoan_dao.update_last_login(tai_khoan["MA_TK"])
+
         return {
             "success": True,
             "message": "Đăng nhập thành công",
             "data": {
                 "ma_tk": tai_khoan["MA_TK"],
-                # Mã trong DB giờ đã là mã chuẩn 7 số, có thể hiển thị trực tiếp
                 "ma_hien_thi": str(tai_khoan["MA_TK"]),
                 "ten_tk": tai_khoan["TEN_TK"],
                 "quyen": tai_khoan["TEN_NQ"],

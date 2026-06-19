@@ -30,8 +30,6 @@
     </table>
 </div>
 
-<div class="pagination" id="promo-pagination"></div>
-
 <div id="promo-modal" class="modal-overlay">
     <div class="modal-content" style="max-width: 650px;">
         <div class="modal-header">
@@ -99,3 +97,29 @@
         </div>
     </div>
 </div>
+
+<div id="promo-history-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 700px; padding: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+        <div class="modal-header" style="background: #262532; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 1.25rem;">Lịch sử dùng mã: <span id="history-promo-code" style="color: #7CCDFF;"></span></h2>
+            <span class="close-modal-btn" id="close-history-modal" style="cursor: pointer; font-size: 24px; color: white;">&times;</span>
+        </div>
+
+        <div class="modal-body" style="padding: 20px; max-height: 60vh; overflow-y: auto; background: #f4f7f6;">
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                <thead>
+                    <tr style="background: #e9ecef; color: #333; text-align: left; font-size: 14px;">
+                        <th style="padding: 12px 15px;">Mã ĐH</th>
+                        <th style="padding: 12px 15px;">Khách hàng</th>
+                        <th style="padding: 12px 15px;">Ngày sử dụng</th>
+                        <th style="padding: 12px 15px; text-align: right;">Tiền giảm</th>
+                    </tr>
+                </thead>
+                <tbody id="promo-history-body" style="font-size: 14px;">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<pagination-box id="promo-pagination"></pagination-box>

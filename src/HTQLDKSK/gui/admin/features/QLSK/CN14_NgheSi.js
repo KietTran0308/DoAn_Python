@@ -1,36 +1,24 @@
 (() => {
+    let allArtistData = [];
     let currentArtistData = [];
     let currentPage = 1;
-    const cardsPerPage = 18; // Cấu hình đúng 10 thẻ div / 1 trang
+    const cardsPerPage = 18;
 
     function init() {
         loadArtistDataFromAPI();
         setupArtistModal();
+        setupSearch();
     }
 
     async function loadArtistDataFromAPI() {
         try {
             const response = await fetch('http://localhost:8000/api/nghe-si');
             if (!response.ok) throw new Error("Lỗi tải API nghệ sĩ");
-            currentArtistData = await response.json();
+            allArtistData = await response.json();
         } catch (error) {
             console.error("Dùng dữ liệu SQL giả định do API lỗi:", error);
-            // Dữ liệu giả lập 12 phần tử để test chức năng sang trang 2
-            currentArtistData = [
-                { MA_NS: 1, TEN_NS: 'Sơn Tùng M-TP', TIEU_SU: 'Ca sĩ nhạc pop Việt Nam, Chủ tịch M-TP Entertainment.', IMAGE_URL: 'url/sontung.jpg' },
-                { MA_NS: 2, TEN_NS: 'Đen Vâu', TIEU_SU: 'Rapper hàng đầu Việt Nam với những bản hit triệu view.', IMAGE_URL: 'url/denvau.jpg' },
-                { MA_NS: 3, TEN_NS: 'Mỹ Tâm', TIEU_SU: 'Họa mi tóc nâu, nữ ca sĩ huyền thoại của V-Pop.', IMAGE_URL: 'url/mytam.jpg' },
-                { MA_NS: 4, TEN_NS: 'Trấn Thành', TIEU_SU: 'MC, Diễn viên hài, Đạo diễn phim điện ảnh.', IMAGE_URL: '' },
-                { MA_NS: 5, TEN_NS: 'Hà Anh Tuấn', TIEU_SU: 'Ca sĩ hát tình ca, nổi tiếng với chuỗi concert See Sing Share.', IMAGE_URL: '' },
-                { MA_NS: 6, TEN_NS: 'Hoàng Thùy Linh', TIEU_SU: 'Nghệ sĩ nhạc dân gian đương đại.', IMAGE_URL: '' },
-                { MA_NS: 7, TEN_NS: 'Binz', TIEU_SU: 'Rapper, Nhạc sĩ, Thành viên SpaceSpeakers.', IMAGE_URL: '' },
-                { MA_NS: 8, TEN_NS: 'Tóc Tiên', TIEU_SU: 'Ca sĩ, Diễn viên với phong cách biểu diễn cuốn hút.', IMAGE_URL: '' },
-                { MA_NS: 9, TEN_NS: 'Đàm Vĩnh Hưng', TIEU_SU: 'Ông hoàng nhạc Việt.', IMAGE_URL: '' },
-                { MA_NS: 10, TEN_NS: 'Trường Giang', TIEU_SU: 'Nghệ sĩ hài, MC truyền hình nổi tiếng.', IMAGE_URL: '' },
-                { MA_NS: 11, TEN_NS: 'Suboi', TIEU_SU: 'Nữ rapper đình đám.', IMAGE_URL: '' },
-                { MA_NS: 12, TEN_NS: 'Soobin', TIEU_SU: 'Ca sĩ R&B, Hoàng tử Ballad.', IMAGE_URL: '' }
-            ];
         }
+        currentArtistData = [...allArtistData];
         currentPage = 1;
         renderArtistGrid();
     }
@@ -76,14 +64,14 @@
 
             // 2. Tạo hình ảnh bên trái (dùng API sinh avatar tạm nếu URL trống hoặc không có http)
             const img = document.createElement('img');
-            img.src = (ns.IMAGE_URL && ns.IMAGE_URL.startsWith('http'))
+            img.src = (ns.IMAGE_URL)
                       ? ns.IMAGE_URL
                       : `https://ui-avatars.com/api/?name=${encodeURIComponent(ns.TEN_NS)}&background=random&size=100`;
-            img.style.cssText = "width: 70px; height: 70px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);";
+            img.style.cssText = "width: 85px; height: 85px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1);";
 
             // 3. Tạo Div chứa thông tin bên phải
             const infoDiv = document.createElement('div');
-            infoDiv.style.cssText = "display: flex; flex-direction: column; overflow: hidden; flex: 1;";
+            infoDiv.style.cssText = "display: flex; flex-direction: column; overflow: hidden; flex: 1; min-width: 0;";
 
             const name = document.createElement('h4');
             name.style.cssText = "margin: 0 0 5px 0; font-size: 16px; color: #262532; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;";
@@ -105,40 +93,16 @@
             gridContainer.appendChild(card);
         });
 
-        const emptySlots = cardsPerPage - pageData.length;
-        for (let i = 0; i < emptySlots; i++) {
-            const emptyCard = document.createElement('div');
-            gridContainer.appendChild(emptyCard);
-        }
-
-        renderArtistPagination();
+        renderPagination();
     }
 
-    function renderArtistPagination() {
+    function renderPagination() {
         const paginationContainer = document.getElementById('artist-pagination');
         if (!paginationContainer) return;
 
-        paginationContainer.replaceChildren();
-
         const totalPages = Math.max(1, Math.ceil(currentArtistData.length / cardsPerPage));
-
-        const prevSpan = document.createElement('span');
-        prevSpan.textContent = '<';
-        prevSpan.onclick = () => { if (currentPage > 1) { currentPage--; renderArtistGrid(); } };
-        paginationContainer.appendChild(prevSpan);
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageSpan = document.createElement('span');
-            pageSpan.textContent = i;
-            if (i === currentPage) pageSpan.classList.add('active');
-            pageSpan.onclick = () => { currentPage = i; renderArtistGrid(); };
-            paginationContainer.appendChild(pageSpan);
-        }
-
-        const nextSpan = document.createElement('span');
-        nextSpan.textContent = '>';
-        nextSpan.onclick = () => { if (currentPage < totalPages) { currentPage++; renderArtistGrid(); } };
-        paginationContainer.appendChild(nextSpan);
+        paginationContainer.setAttribute('total-pages', totalPages);
+        paginationContainer.setAttribute('current-page', currentPage);
     }
 
     function setupArtistModal() {
@@ -189,6 +153,31 @@
         }
 
         modal.style.display = 'flex';
+    }
+
+    function setupSearch() {
+        document.addEventListener('search-changed', (e) => {
+            const keyword = e.detail.value.toLowerCase().trim();
+
+            if (!keyword) {
+                currentArtistData = [...allArtistData];
+            } else {
+                currentArtistData = allArtistData.filter(ns =>
+                    (ns.TEN_NS && ns.TEN_NS.toLowerCase().includes(keyword)) ||
+                    (ns.TIEU_SU && ns.TIEU_SU.toLowerCase().includes(keyword)) ||
+                    (ns.MA_NS && ns.MA_NS.toString().includes(keyword))
+                );
+            }
+            currentPage = 1;
+            renderArtistGrid();
+        });
+
+        document.addEventListener('page-changed', (e) => {
+            if (e.target.id === 'artist-pagination') {
+                currentPage = e.detail.page;
+                renderArtistGrid();
+            }
+        });
     }
 
     init();

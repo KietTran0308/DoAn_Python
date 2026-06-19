@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống Kê Hoạt Động</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container { padding: 20px; display: flex; flex-direction: column; gap: 20px; background: #f4f7f6; min-height: 100vh;}
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .kpi-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between;}
+        .kpi-info h4 { margin: 0; font-size: 14px; color: #6c757d; font-weight: normal;}
+        .kpi-info h2 { margin: 5px 0 0 0; font-size: 24px; color: #262532;}
+        .kpi-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .panel h3 { margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #262532; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+
+        .log-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .log-item:last-child { border-bottom: none; }
+        .log-left { display: flex; flex-direction: column; gap: 4px; }
+        .log-title { font-weight: bold; font-size: 14px; color: #262532; }
+        .log-desc { font-size: 12px; color: #888; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-success { background: #d4edda; color: #28a745; }
+        .badge-danger { background: #f8d7da; color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="toolbar" style="background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div class="tb-left" style="display: flex; gap: 15px; align-items: center;">
+                <select id="filter-event" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; width: 300px; font-weight: bold;">
+                    </select>
+                <select id="filter-date" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; outline: none;">
+                    <option value="all">Tất cả thời gian</option>
+                    <option value="today">Hôm nay</option>
+                </select>
+            </div>
+            <div class="tb-right" style="display: flex; gap: 15px; align-items: center;">
+                <button class="btn-save" style="background: #1dd1a1; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">🔄 Làm mới dữ liệu</button>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Tổng Lượt Check-in</h4>
+                    <h2 id="kpi-total-scans">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #eef2ff; color: #007bff;">🎫</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Quét Hợp Lệ</h4>
+                    <h2 id="kpi-valid-scans">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #e9f7ef; color: #28a745;">✅</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Quét Thất Bại / Vé Lỗi</h4>
+                    <h2 id="kpi-invalid-scans" style="color: #dc3545;">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #ffeaea; color: #dc3545;">🚨</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Cổng Hoạt Động</h4>
+                    <h2 id="kpi-active-gates">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #fef5e7; color: #f39c12;">🚪</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel">
+                    <h3>Lưu lượng Check-in theo Khung Giờ</h3>
+                    <div style="height: 250px;">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h3>Phân bổ khách qua các Cổng (Gates)</h3>
+                    <div style="height: 200px;">
+                        <canvas id="gatesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Lịch sử quét vé gần nhất</h3>
+                <div id="recent-logs-list" style="display: flex; flex-direction: column;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="CN42_ThongKeHoatDong.js"></script>
+</body>
+</html>

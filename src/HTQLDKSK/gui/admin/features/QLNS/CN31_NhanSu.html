@@ -1,6 +1,6 @@
 <div class="toolbar">
     <div class="tb-left">
-        <search-box placeholder="Tìm theo tên, username, email..."></search-box>
+        <search-box id="search-staff" placeholder="Tìm theo tên, username, email..."></search-box>
         <select id="filter-role">
             <option value="">Tất cả phòng ban / Quyền</option>
             <option value="1">Admin (Quản trị hệ thống)</option>
@@ -17,7 +17,7 @@
 <div id="staff-grid-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; flex-grow: 1; align-content: start; padding: 15px 0;">
 </div>
 
-<div class="pagination" id="staff-pagination"></div>
+<pagination-box class="pagination" id="staff-pagination"></pagination-box>
 
 <div id="staff-modal" class="modal-overlay">
     <div class="modal-content" style="max-width: 650px;">
@@ -69,6 +69,18 @@
                             <option value="1" selected>🟢 Đang hoạt động</option>
                             <option value="0">🔴 Khóa tài khoản</option>
                         </select>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Ngày tạo tài khoản</label>
+                            <input id="NGAY_TAO" readonly style="background-color: #e9ecef; color: #6c757d;"
+                                   type="text">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Lần đăng nhập cuối</label>
+                            <input id="LAN_DANG_NHAP_CUOI" readonly style="background-color: #e9ecef; color: #6c757d;"
+                                   type="text">
+                        </div>
                     </div>
                 </div>
 

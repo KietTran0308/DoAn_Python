@@ -225,3 +225,15 @@ class TaiKhoanDAO:
             raise e
         finally:
             cursor.close()
+
+    def update_last_login(self, ma_tk):
+        cursor = self.db.cursor()
+        try:
+            query = "UPDATE tai_khoan SET LAN_DANG_NHAP_CUOI = CURRENT_TIMESTAMP WHERE MA_TK = %s"
+            cursor.execute(query, (ma_tk,))
+            self.db.commit()
+        except Exception as e:
+            self.db.rollback()
+            raise e
+        finally:
+            cursor.close()

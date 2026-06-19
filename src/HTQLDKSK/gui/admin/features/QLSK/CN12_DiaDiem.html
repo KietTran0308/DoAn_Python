@@ -1,6 +1,27 @@
 <div class="toolbar">
     <div class="tb-left">
         <search-box placeholder="Tìm theo tên địa điểm, địa chỉ..."></search-box>
+
+        <select id="filter-city">
+            <option value="">Tất cả khu vực</option>
+            <option value="Hà Nội">Hà Nội</option>
+            <option value="TP.HCM">TP.HCM</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
+            <option value="Cần Thơ">Cần Thơ</option>
+            <option value="Hải Phòng">Hải Phòng</option>
+        </select>
+
+        <select id="filter-type">
+            <option value="">Tất cả loại hình</option>
+            <option value="FIXED_SEAT">Ghế cố định (Nhà hát)</option>
+            <option value="ZONE_BASED">Khu tự do (Sân vận động)</option>
+        </select>
+
+        <select id="filter-status">
+            <option value="">Trạng thái sơ đồ</option>
+            <option value="1">✅ Đã cấu hình</option>
+            <option value="0">⚠️ Chưa cấu hình</option>
+        </select>
     </div>
     <div class="tb-right">
         <button class="add-btn" id="btn-open-add-location">+ Thêm Địa Điểm</button>
@@ -23,95 +44,112 @@
     </table>
 </div>
 
-<div class="pagination" id="location-pagination"></div>
+<div id="location-builder-fullscreen"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f7f6; z-index: 9999; flex-direction: row;">
 
-<div id="layout-builder-fullscreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f4f7f6; z-index: 9999; flex-direction: column;">
+    <div style="flex: 3; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; overflow-y: auto; z-index: 2;">
 
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background-color: #262532; color: white;">
-        <h2 style="margin: 0; font-size: 1.25rem;">🗺️ Thiết kế Sơ đồ gốc: <span id="layout-location-name" style="color: #80ceff;"></span></h2>
-        <div style="display: flex; gap: 10px;">
-            <button type="button" class="btn-cancel" id="cancel-layout-btn" style="padding: 8px 15px;">Đóng Sơ đồ</button>
-            <button type="button" class="btn-save" id="save-layout-btn" style="background-color: #28a745; padding: 8px 15px;">💾 Lưu Master Layout</button>
-        </div>
-    </div>
-
-    <div style="display: flex; flex-grow: 1; overflow: hidden;">
-
-        <div style="width: 320px; background: white; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); overflow-y: auto; z-index: 2;">
-            <h3 style="margin-top: 0;">Công cụ thiết kế</h3>
-            <hr style="margin: 10px 0; border: 0; border-top: 1px solid #eee;">
-
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label style="font-weight: bold; display: block; margin-bottom: 8px;">1. Tải ảnh mặt bằng (Tùy chọn)</label>
-                <input type="file" id="upload-background" accept="image/*" style="width: 100%;">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
-                <label style="font-weight: bold; display: block; margin-bottom: 10px;">2. Công cụ rải ghế</label>
-                <input type="text" id="MASTER_DAY_GHE" placeholder="Dãy (VD: A)" style="margin-bottom: 10px; width: 100%; box-sizing: border-box;">
-                <input type="number" id="MASTER_SO_GHE" placeholder="Số ghế bắt đầu (VD: 1)" style="margin-bottom: 15px; width: 100%; box-sizing: border-box;">
-                <button type="button" id="btn-generate-master-seats" class="btn-save" style="width: 100%; background: #6c757d; font-size: 1.1rem; padding: 12px;">
-                    ⚡ Kích hoạt rải ghế
-                </button>
-
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button type="button" id="btn-undo-seat" style="flex: 1; padding: 8px; background-color: #ffc107; color: #212529; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                        ↩ Hoàn tác
-                    </button>
-                    <button type="button" id="btn-clear-seats" style="flex: 1; padding: 8px; background-color: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
-                        🗑 Xóa hết
-                    </button>
-                </div>
-            </div>
-
-            <div style="font-size: 0.9rem; color: #666; font-style: italic;">
-                * Hướng dẫn: Nhập Dãy và Số bắt đầu. Kích hoạt nút, sau đó click chuột trái lên phần không gian bên phải để rải ghế. Click chuột phải để hủy chế độ rải.
-            </div>
+        <div style="padding: 20px 25px; background: #262532; color: white;">
+            <h2 style="margin: 0; font-size: 1.25rem;">📍 Thiết lập Địa Điểm</h2>
         </div>
 
-        <div id="canvas-container" style="flex-grow: 1; background: #e9ecef; position: relative; overflow: auto; display: flex; justify-content: center; align-items: center;">
-            <canvas id="masterLayoutCanvas" style="background: white; box-shadow: 0 0 15px rgba(0,0,0,0.1); cursor: default;"></canvas>
-        </div>
-
-    </div>
-</div>
-
-<div id="add-location-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h2>📍 Thêm Địa Điểm Mới</h2>
-            <span class="close-modal-btn" id="close-location-modal">&times;</span>
-        </div>
-
-        <div class="modal-body">
-            <form id="locationForm">
+        <div style="padding: 25px;">
+            <form id="add-location-form" style="display: flex; flex-direction: column; gap: 15px;">
                 <div class="form-group">
-                    <label for="TEN_DD">Tên địa điểm <span class="required">*</span></label>
-                    <input type="text" id="TEN_DD" name="TEN_DD" placeholder="VD: Sân vận động Mỹ Đình" required>
+                    <label>Loại địa điểm <span class="required">*</span></label>
+                    <select id="LOAI_DD" required
+                            style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; color: #262532;">
+                        <option value="FIXED_SEAT">Ghế cố định (Nhà hát, Rạp chiếu...)</option>
+                        <option value="ZONE_BASED">Khu vực tự do (Sân vận động, Fanzone...)</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="DIA_CHI">Địa chỉ <span class="required">*</span></label>
-                    <input type="text" id="DIA_CHI" name="DIA_CHI" placeholder="Nhập địa chỉ đầy đủ..." required>
+                    <label>Tên địa điểm <span class="required">*</span></label>
+                    <input id="TEN_DD" placeholder="VD: Sân vận động Mỹ Đình" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"
+                           type="text">
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="TONG_SO_COT">Lưới không gian - Số Cột (X)</label>
-                        <input type="number" id="TONG_SO_COT" name="TONG_SO_COT" value="50" min="10">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label for="TONG_SO_HANG">Lưới không gian - Số Hàng (Y)</label>
-                        <input type="number" id="TONG_SO_HANG" name="TONG_SO_HANG" value="40" min="10">
-                    </div>
+                <div class="form-group">
+                    <label>Địa chỉ <span class="required">*</span></label>
+                    <input id="DIA_CHI" placeholder="Nhập địa chỉ đầy đủ..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"
+                           type="text">
                 </div>
-                <small style="color: #666; font-style: italic;">* Lưới không gian dùng để giới hạn kích thước Canvas khi rải ghế vật lý.</small>
+
+                <hr style="border: none; border-top: 1px dashed #ccc; margin: 10px 0;">
+
+                <div id="tools_fixed_seat">
+                    <h3 style="font-size: 14px; margin-bottom: 10px; color: #f39c12;">🔲 Cấu hình Ma trận ghế:</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px;">Số Cột (X)</label>
+                            <input id="TONG_SO_COT" min="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" type="number"
+                                   value="30">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 12px;">Số Hàng (Y)</label>
+                            <input id="TONG_SO_HANG" min="5" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" type="number"
+                                   value="20">
+                        </div>
+                    </div>
+                    <button class="btn-save" id="btn-generate-matrix" style="width: 100%; background: #f39c12; margin-bottom: 10px;"
+                            type="button">⚡ Sinh ma trận ghế
+                    </button>
+                    <button class="btn-cancel" id="btn-toggle-seat-edit" style="width: 100%; color: #e74c3c; border: 1px solid #e74c3c;"
+                            type="button">🖍️ Bật chế độ Thêm/Xóa ghế
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px; line-height: 1.5;">* <b>Hướng dẫn:</b>
+                        Sinh ma trận để tạo ghế. Sau đó Bật chế độ Thêm/Xóa, click vào ghế để xóa lối đi, hoặc click vào
+                        chỗ trống để tạo ghế mới.</p>
+                </div>
+
+                <div id="tools_zone_based" style="display: none;">
+                    <h3 style="font-size: 14px; margin-bottom: 10px; color: #9b59b6;">🗺️ Cấu hình Khu vực tự do:</h3>
+                    <div class="form-group">
+                        <label style="font-size: 12px;">Tải Sơ đồ mặt bằng (Floor Plan)</label>
+                        <input accept="image/*" id="FLOOR_PLAN_IMG" style="width: 100%; padding: 8px; border: 1px dashed #ccc; border-radius: 4px; margin-bottom: 15px;"
+                               type="file">
+                    </div>
+
+                    <button class="btn-save" id="btn-draw-polygon" style="width: 100%; background: #9b59b6; margin-bottom: 10px;"
+                            type="button">🖍️ Bắt đầu vẽ Khu vực
+                    </button>
+                    <button class="btn-save" id="btn-finish-polygon" style="width: 100%; background: #27ae60; margin-bottom: 10px; display: none;"
+                            type="button">✅ Hoàn thành
+                        vùng đang vẽ
+                    </button>
+                    <button class="btn-cancel" id="btn-delete-polygon" style="width: 100%; color: #e74c3c; border: 1px solid #e74c3c;"
+                            type="button">🗑️ Bật chế độ Xóa Khu vực
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px; line-height: 1.5;">* <b>Hướng dẫn:</b> Tải
+                        ảnh nền lên. Bấm "Bắt đầu vẽ", click chuột liên tiếp tạo các đỉnh quanh khu vực. Bấm "Hoàn
+                        thành" để khép góc và nhập sức chứa.</p>
+                </div>
             </form>
         </div>
 
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="cancel-location-btn">Hủy bỏ</button>
-            <button type="button" class="btn-save" id="save-location-btn">Lưu địa điểm</button>
+        <div style="margin-top: auto; padding: 20px; display: flex; gap: 15px; border-top: 1px solid #eee; background: #f8f9fa;">
+            <button class="btn-cancel" id="close-location-builder" style="flex: 1;">Hủy bỏ</button>
+            <button class="btn-save" id="save-location-btn" style="flex: 1; background: #1dd1a1; color: #100F1A;">💾 Lưu
+                Địa Điểm
+            </button>
+        </div>
+    </div>
+
+    <div style="flex: 7; display: flex; flex-direction: column; background: #e9ecef; position: relative;">
+        <div style="padding: 15px 25px; background-color: white; border-bottom: 1px solid #ddd;">
+            <h3 style="margin: 0; color: #262532; font-size: 16px;">🔍 Sơ đồ: <span id="preview-loc-name"
+                                                                                   style="color: #7CCDFF;">Chưa đặt tên</span>
+            </h3>
+        </div>
+
+        <div style="flex: 1; overflow: auto; display: flex; justify-content: center; align-items: center; padding: 20px;">
+            <canvas height="700" id="masterLayoutCanvas" style="background-color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: crosshair;"
+                    width="1000"></canvas>
         </div>
     </div>
 </div>
+
+<pagination-box id="location-pagination"></pagination-box>
+
+

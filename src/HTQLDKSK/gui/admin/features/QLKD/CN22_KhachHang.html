@@ -1,6 +1,13 @@
 <div class="toolbar">
     <div class="tb-left">
         <search-box placeholder="Tìm theo tên, email, SĐT..."></search-box>
+
+        <select id="filter-role-customer">
+            <option value="">Tất cả hạng khách</option>
+            <option value="4">Khách thường</option>
+            <option value="5">Khách VIP</option>
+        </select>
+
         <select id="filter-status-customer">
             <option value="">Tất cả trạng thái</option>
             <option value="1">Đang hoạt động</option>
@@ -21,6 +28,7 @@
             <th>Họ và tên</th>
             <th>Email</th>
             <th>Số điện thoại</th>
+            <th style="text-align: center;">Hạng khách</th>
             <th style="text-align: center;">Trạng thái</th>
             <th class="col-actions">Thao tác</th>
         </tr>
@@ -30,60 +38,85 @@
     </table>
 </div>
 
-<div class="pagination" id="customer-pagination"></div>
+<div id="customer-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 800px; padding: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
 
-<div id="customer-modal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">
-            <h2 id="customer-modal-title">Thông tin Khách hàng</h2>
-            <span class="close-modal-btn" id="close-customer-modal">&times;</span>
+        <div class="modal-header" style="background: #262532; color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 1.25rem;">Hồ sơ Khách hàng</h2>
+            <span class="close-modal-btn" id="close-customer-modal" style="cursor: pointer; font-size: 24px; color: white;">&times;</span>
         </div>
-        <div class="modal-body">
-            <form id="customerForm">
-                <div style="display: flex; gap: 15px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label>Mã Khách Hàng</label>
-                        <input type="text" id="detail-ma-kh" readonly style="background-color: #e9ecef; cursor: not-allowed;">
-                    </div>
-                    <div class="form-group" style="flex: 2;">
-                        <label>Tên tài khoản</label>
-                        <input type="text" id="detail-ten-tk" readonly style="background-color: #e9ecef; cursor: not-allowed;">
-                    </div>
-                </div>
 
-                <div style="display: flex; gap: 15px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label>Họ</label>
-                        <input type="text" id="detail-ho" readonly>
+        <div class="modal-body" style="display: flex; background: #f4f7f6; padding: 0;">
+            <div style="width: 260px; background: white; padding: 30px 20px; text-align: center; border-right: 1px solid #eee; display: flex; flex-direction: column; align-items: center;">
+                <img id="detail-avatar" src="" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #7CCDFF; padding: 3px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <h3 id="detail-display-name" style="margin: 0 0 5px 0; color: #262532; font-size: 18px;"></h3>
+                <p id="detail-username-badge" style="color: #0984e3; font-weight: bold; margin: 0 0 20px 0; font-size: 14px;"></p>
+
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left; font-size: 13px; color: #666; width: 100%; border: 1px solid #eee;">
+                    <div style="margin-bottom: 8px; display: flex; justify-content: space-between;">
+                        <span>🛒 Đã đặt:</span> <b id="detail-total-orders" style="color: #333;">-</b>
                     </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label>Tên</label>
-                        <input type="text" id="detail-ten" readonly>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>💰 Tổng chi:</span> <b id="detail-total-spent" style="color: #28a745;">-</b>
                     </div>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="detail-email" readonly>
-                </div>
+            <div style="flex: 1; padding: 25px 30px;">
+                <h4 style="margin-top: 0; margin-bottom: 15px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Thông tin cá nhân</h4>
 
-                <div class="form-group">
-                    <label>Số điện thoại</label>
-                    <input type="text" id="detail-sdt" readonly>
-                </div>
+                <form id="customerForm" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input type="hidden" id="detail-ma-kh">
 
-                <div class="form-group">
-                    <label>Trạng thái tài khoản</label>
-                    <select id="detail-trang-thai">
-                        <option value="1">Đang hoạt động</option>
-                        <option value="0">Khóa tài khoản</option>
-                    </select>
-                </div>
-            </form>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Họ đệm</label>
+                            <input type="text" id="detail-ho" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #e9ecef; color: #555; outline: none;" readonly>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Tên</label>
+                            <input type="text" id="detail-ten" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #e9ecef; color: #555; outline: none;" readonly>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Số điện thoại</label>
+                            <input type="text" id="detail-sdt" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #e9ecef; color: #555; outline: none;" readonly>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Email liên hệ</label>
+                            <input type="email" id="detail-email" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; background: #e9ecef; color: #555; outline: none;" readonly>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 10px; margin-bottom: 5px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Thiết lập phân quyền</h4>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Hạng khách hàng <span style="color: #f39c12; font-weight: normal;">(Cho phép sửa)</span></label>
+                            <select id="detail-ma-nq" style="padding: 10px; border: 2px solid #7CCDFF; border-radius: 6px; font-weight: bold; color: #262532; outline: none; cursor: pointer;">
+                                <option value="4">👤 Khách hàng (Thường)</option>
+                                <option value="5">👑 Khách hàng VIP</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="font-size: 13px; color: #666; font-weight: 600;">Trạng thái <span style="color: #f39c12; font-weight: normal;">(Cho phép sửa)</span></label>
+                            <select id="detail-trang-thai" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-weight: bold; color: #333; outline: none; cursor: pointer;">
+                                <option value="1">🟢 Đang hoạt động</option>
+                                <option value="0">🔴 Khóa tài khoản</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="modal-footer">
-            <button type="button" class="btn-cancel" id="cancel-customer-btn">Đóng</button>
-            <button type="button" class="btn-save" id="save-customer-btn" style="background-color: #007bff;">Lưu thay đổi</button>
+
+        <div class="modal-footer" style="padding: 15px 25px; border-top: 1px solid #ddd; background: white; display: flex; justify-content: flex-end; gap: 15px;">
+            <button type="button" class="btn-cancel" id="cancel-customer-btn" style="padding: 10px 20px;">Hủy bỏ</button>
+            <button type="button" class="btn-save" id="save-customer-btn" style="background-color: #1dd1a1; color: #100F1A; padding: 10px 20px; font-size: 15px;">💾 Cập nhật quyền</button>
         </div>
     </div>
 </div>
+
+<pagination-box id="customer-pagination"></pagination-box>

@@ -7,10 +7,10 @@
     </div>
 </div>
 
-<div id="artist-grid-container" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(6, 120px); gap: 20px; flex-grow: 1; align-content: start;">
+<div style="flex-grow: 1; padding-right: 10px; margin-top: 15px; min-width: 0;">
+    <div id="artist-grid-container" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-content: start;">
+    </div>
 </div>
-
-<div class="pagination" id="artist-pagination"></div>
 
 <div id="artist-modal" class="modal-overlay">
     <div class="modal-content" style="max-width: 600px;">
@@ -47,3 +47,5 @@
         </div>
     </div>
 </div>
+
+<pagination-box id="artist-pagination"></pagination-box>

@@ -8,7 +8,7 @@ class NhanSuDAO:
     def get_all(self):
         cursor = self.db.cursor(dictionary=True)
         query = """
-            SELECT tk.MA_TK, tk.TEN_TK, tk.MA_NQ, tk.TRANG_THAI,
+            SELECT tk.MA_TK, tk.TEN_TK, tk.MA_NQ, tk.TRANG_THAI, tk.NGAY_TAO, tk.LAN_DANG_NHAP_CUOI,
                    nq.TEN_NQ, nd.HO, nd.TEN, nd.EMAIL, nd.SDT
             FROM tai_khoan tk
             JOIN nhom_quyen nq ON tk.MA_NQ = nq.MA_NQ
@@ -24,7 +24,7 @@ class NhanSuDAO:
     def get_by_id(self, ma_tk):
         cursor = self.db.cursor(dictionary=True)
         query = """
-            SELECT tk.MA_TK, tk.TEN_TK, tk.MA_NQ, tk.TRANG_THAI,
+            SELECT tk.MA_TK, tk.TEN_TK, tk.MA_NQ, tk.TRANG_THAI, tk.NGAY_TAO, tk.LAN_DANG_NHAP_CUOI,
                    nq.TEN_NQ, nd.HO, nd.TEN, nd.EMAIL, nd.SDT
             FROM tai_khoan tk
             JOIN nhom_quyen nq ON tk.MA_NQ = nq.MA_NQ

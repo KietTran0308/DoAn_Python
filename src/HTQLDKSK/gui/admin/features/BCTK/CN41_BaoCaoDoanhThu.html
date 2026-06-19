@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Báo Cáo Doanh Thu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container { padding: 20px; display: flex; flex-direction: column; gap: 20px; background: #f4f7f6; min-height: 100vh;}
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .kpi-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between;}
+        .kpi-info h4 { margin: 0; font-size: 14px; color: #6c757d; font-weight: normal;}
+        .kpi-info h2 { margin: 5px 0 0 0; font-size: 24px; color: #262532;}
+        .kpi-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .panel { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .panel h3 { margin-top: 0; margin-bottom: 20px; font-size: 16px; color: #262532; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+
+        .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .transaction-item:last-child { border-bottom: none; }
+        .tx-left { display: flex; flex-direction: column; gap: 4px; }
+        .tx-title { font-weight: bold; font-size: 14px; color: #262532; }
+        .tx-date { font-size: 12px; color: #888; }
+        .tx-right { font-weight: bold; font-size: 15px; color: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="toolbar" style="background: white; padding: 15px 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+            <div class="tb-left" style="display: flex; gap: 15px; align-items: center;">
+                <select id="filter-time-group" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-weight: bold;">
+                    <option value="month">Xem theo Tháng</option>
+                    <option value="week">Xem theo Tuần</option>
+                    <option value="quarter">Xem theo Quý</option>
+                    <option value="year">Xem theo Năm</option>
+                </select>
+
+                <select id="filter-event" style="padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; outline: none; width: 250px;">
+                    <option value="">Tất cả sự kiện</option>
+                </select>
+            </div>
+            <div class="tb-right" style="display: flex; gap: 15px; align-items: center;">
+                <div style="background: #fff3cd; padding: 5px 10px; border-radius: 6px; font-size: 12px;">
+                    <label>Giả lập Role: </label>
+                    <select id="mock-role-select" style="border: none; background: transparent; outline: none; font-weight: bold;">
+                        <option value="1">Admin (Xem tất cả)</option>
+                        <option value="7">Organizer (Chỉ xem của mình)</option>
+                    </select>
+                </div>
+                <button class="btn-save" style="background: #1dd1a1; color: white; padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">📥 Xuất Báo Cáo</button>
+            </div>
+        </div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Tổng Doanh Thu</h4>
+                    <h2 id="kpi-revenue">0 ₫</h2>
+                </div>
+                <div class="kpi-icon" style="background: #eef2ff; color: #007bff;">💰</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Đơn Hàng Thành Công</h4>
+                    <h2 id="kpi-orders">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #e9f7ef; color: #28a745;">🛒</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Tổng Tiền Giảm Giá</h4>
+                    <h2 id="kpi-discount">0 ₫</h2>
+                </div>
+                <div class="kpi-icon" style="background: #fef5e7; color: #f39c12;">🎟️</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-info">
+                    <h4>Đơn Chờ / Hủy</h4>
+                    <h2 id="kpi-failed">0</h2>
+                </div>
+                <div class="kpi-icon" style="background: #ffeaea; color: #dc3545;">⚠️</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel">
+                    <h3 id="bar-chart-title">Biểu đồ Doanh thu</h3>
+                    <canvas id="revenueBarChart" height="100"></canvas>
+                </div>
+                <div class="panel">
+                    <h3>Tỷ trọng Doanh thu theo Sự kiện</h3>
+                    <div style="height: 250px; display: flex; justify-content: center;">
+                        <canvas id="eventPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Giao dịch mới nhất</h3>
+                <div id="recent-transactions-list" style="display: flex; flex-direction: column;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="CN41_BaoCaoDoanhThu.js"></script>
+</body>
+</html>

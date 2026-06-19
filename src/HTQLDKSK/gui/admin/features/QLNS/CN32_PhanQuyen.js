@@ -1,8 +1,8 @@
 (() => {
     let rolesData = [];
     let functionsData = [];
-    let currentPermissions = []; // Dữ liệu quyền gốc
-    let editingPermissions = []; // Dữ liệu quyền nháp khi đang Sửa
+    let currentPermissions = [];
+    let editingPermissions = [];
 
     let isEditing = false;
     let currentSelectedRole = null;
@@ -61,7 +61,6 @@
         btnToggle.addEventListener('click', () => {
             if (!isEditing) {
                 isEditing = true;
-                // Sao chép sâu (deep copy) dữ liệu gốc ra bản nháp để sửa
                 editingPermissions = JSON.parse(JSON.stringify(currentPermissions));
                 updateToggleButtonUI();
                 renderPermissionTable();
@@ -206,30 +205,10 @@
     function renderPagination() {
         const paginationContainer = document.getElementById('permission-pagination');
         if (!paginationContainer) return;
-        paginationContainer.replaceChildren();
 
-        const totalPages = Math.ceil(functionsData.length / rowsPerPage);
-        if (totalPages <= 1) return;
-
-        const btnStyle = "padding: 5px 12px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: white; user-select: none;";
-        const activeStyle = "background: #007bff; color: white; border-color: #007bff;";
-
-        for (let i = 1; i <= totalPages; i++) {
-            const pageSpan = document.createElement('span');
-            pageSpan.textContent = i;
-            pageSpan.style.cssText = btnStyle;
-
-            if (i === currentPage) {
-                pageSpan.style.cssText += activeStyle;
-            }
-
-            pageSpan.addEventListener('click', () => {
-                currentPage = i;
-                renderPermissionTable();
-            });
-
-            paginationContainer.appendChild(pageSpan);
-        }
+        const totalPages = Math.max(1, Math.ceil(functionsData.length / rowsPerPage));
+        paginationContainer.setAttribute('total-pages', totalPages);
+        paginationContainer.setAttribute('current-page', currentPage);
     }
 
     async function savePermissions() {

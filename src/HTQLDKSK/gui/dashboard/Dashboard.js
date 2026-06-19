@@ -236,7 +236,7 @@ function renderTrendingEvents() {
         `;
 
         item.addEventListener('click', () => {
-            window.location.href = `EventDetail.html?id=${event.MA_SK}`;
+            window.location.href = `user/EventDetail.html?id=${event.MA_SK}`;
         });
 
         track.appendChild(item);
@@ -293,7 +293,7 @@ function renderEvents(page) {
 
         // Click vào thẻ để chuyển trang chi tiết sự kiện
         card.addEventListener('click', () => {
-            window.location.href = `EventDetail.html?id=${event.MA_SK}`;
+            window.location.href = `user/EventDetail.html?id=${event.MA_SK}`;
         });
 
         grid.appendChild(card);
@@ -487,7 +487,7 @@ function renderRecommendedEvents() {
         `;
 
         card.addEventListener('click', () => {
-            window.location.href = `EventDetail.html?id=${item.event.MA_SK}`;
+            window.location.href = `user/EventDetail.html?id=${item.event.MA_SK}`;
         });
 
         track.appendChild(card);

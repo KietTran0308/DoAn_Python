@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mainContentArea = document.getElementById('content-area');
     fetchMenusFromAPI();
     startRealtimeClock();
+    setupUserProfile();
 });
 
 async function fetchMenusFromAPI() {
@@ -90,7 +91,7 @@ function initializeSidebar() {
 
         const iconImg = document.createElement('img');
         iconImg.classList.add('menu-icon');
-        iconImg.src = `../img/CN${menu.MA_CN}.png`;
+        iconImg.src = `/img/CN${menu.MA_CN}.png`;
 
         const textSpan = document.createElement('span');
         textSpan.textContent = menu.TEN_CN;
@@ -205,4 +206,54 @@ function loadTabContent(maChucNang) {
         .catch(error => {
             currentTab.innerHTML = `<h2 style="color: #ff6b6b; text-align: center; margin-top: 50px;">❌ Chức năng đang được xây dựng</h2>`;
         });
+}
+
+function setupUserProfile() {
+    // 1. Lấy thông tin user từ SessionStorage (đã chặn ở đầu file Admin.js)
+    const userObj = JSON.parse(sessionStorage.getItem('user')) || {};
+
+    // Tùy theo cấu trúc JSON bạn trả về từ Backend (thường là TEN hoặc USERNAME)
+    const nameFallback = userObj.ten || userObj.TEN || userObj.username || 'Admin';
+    const roleFallback = userObj.quyen || 'Quản trị viên';
+
+    // 2. Gắn thông tin vào giao diện
+    document.getElementById('header-user-name').textContent = nameFallback;
+    document.getElementById('dropdown-name').textContent = nameFallback;
+    document.getElementById('dropdown-role').textContent = roleFallback;
+
+    // 3. Dùng API tạo avatar ngẫu nhiên dựa trên chữ cái đầu của tên
+    const avatarImg = document.getElementById('header-avatar-img');
+    if (avatarImg) {
+        // Tạo avatar màu xanh biển nhạt cho hợp tông màu website
+        avatarImg.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameFallback)}&background=80ceff&color=11101C&bold=true`;
+    }
+
+    // 4. Logic Ẩn/Hiện Dropdown
+    const avatarBtn = document.getElementById('avatar-btn');
+    const dropdown = document.getElementById('profile-dropdown');
+
+    if (avatarBtn && dropdown) {
+        avatarBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Ngăn sự kiện click truyền ra ngoài body
+            dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        // Click ra ngoài khoảng trống thì đóng dropdown
+        window.addEventListener('click', (e) => {
+            if (!avatarBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+
+    // 5. Chức năng Đăng xuất
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('🚪 Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?')) {
+                sessionStorage.removeItem('user'); // Xóa phiên đăng nhập
+                window.location.href = '../login/Login.html'; // Đẩy về trang Login
+            }
+        });
+    }
 }

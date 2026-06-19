@@ -12,6 +12,15 @@ class NhanSuBUS:
         for ns in ds:
             ns['HO_TEN'] = f"{ns.get('HO', '')} {ns.get('TEN', '')}".strip()
             ns['TRANG_THAI_TEXT'] = 'Hoạt động' if ns['TRANG_THAI'] == 1 else 'Bị khóa'
+
+            # Format datetime sang dạng chuỗi d/m/y H:M
+            if ns.get('NGAY_TAO'):
+                ns['NGAY_TAO'] = ns['NGAY_TAO'].strftime('%d/%m/%Y %H:%M')
+            if ns.get('LAN_DANG_NHAP_CUOI'):
+                ns['LAN_DANG_NHAP_CUOI'] = ns['LAN_DANG_NHAP_CUOI'].strftime('%d/%m/%Y %H:%M')
+            else:
+                ns['LAN_DANG_NHAP_CUOI'] = 'Chưa từng đăng nhập'
+
         return ds
 
     def tao_tai_khoan(self, data):

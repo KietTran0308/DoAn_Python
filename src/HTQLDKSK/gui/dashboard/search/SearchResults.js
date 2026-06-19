@@ -104,7 +104,7 @@ function renderEvents(page) {
         `;
 
         card.addEventListener('click', () => {
-            window.location.href = `EventDetail.html?id=${event.MA_SK}`;
+            window.location.href = `../user/EventDetail.html?id=${event.MA_SK}`;
         });
 
         grid.appendChild(card);
