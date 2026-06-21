@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chọn ghế & Đặt vé - NovaEntry</title>
+    <!-- Kế thừa CSS gốc từ Dashboard -->
+    <link href="../Dashboard.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        /* =========================================
+           CSS CHUYÊN BIỆT CHO MÀN HÌNH ĐẶT VÉ
+           ========================================= */
+        body {
+            background-color: #100F1A;
+            color: #ffffff;
+        }
+
+        .booking-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding: 40px 200px;
+            min-height: 80vh;
+        }
+
+        /* ----- CỘT TRÁI: SƠ ĐỒ GHẾ ----- */
+        .seat-map-section {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage {
+            width: 80%;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(124, 204, 255, 0.3) 0%, transparent 100%);
+            border-top: 4px solid #7CCDFF;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font: bold 20px 'Space Grotesk', sans-serif;
+            color: #7CCDFF;
+            text-shadow: 0 0 10px rgba(124, 204, 255, 0.5);
+            margin-bottom: 50px;
+            letter-spacing: 5px;
+        }
+
+        .seat-legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            font-size: 14px;
+            color: #C7C4D8;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .seat {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px 8px 4px 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #100F1A;
+            border: 2px solid transparent;
+        }
+
+        /* Các trạng thái của ghế */
+        .seat.available {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .seat.available:hover {
+            transform: scale(1.1);
+            border-color: #7CCDFF;
+        }
+        .seat.selected {
+            background-color: #1dd1a1 !important;
+            color: #100F1A !important;
+            box-shadow: 0 0 15px rgba(29, 209, 161, 0.5);
+            transform: scale(1.1);
+        }
+        .seat.sold {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: rgba(255, 255, 255, 0.3);
+            border-color: transparent;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .btn-qty {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.2s;
+        }
+        .btn-qty:hover {
+            background: #1dd1a1;
+            color: #100F1A;
+            border-color: #1dd1a1;
+        }
+
+        .zone-container {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .zone-title {
+            font: bold 18px 'Space Grotesk', sans-serif;
+            color: #7CCDFF;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* ----- CỘT PHẢI: GIỎ HÀNG ----- */
+        .cart-section {
+            position: sticky;
+            top: 12vh;
+            height: fit-content;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(124, 204, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .cart-section h2 {
+            font: bold 24px 'Space Grotesk', sans-serif;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .event-summary {
+            margin-bottom: 20px;
+        }
+
+        .event-summary h4 {
+            font-size: 18px;
+            color: #7CCDFF;
+            margin-bottom: 5px;
+        }
+
+        .event-summary p {
+            color: #C7C4D8;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .selected-seats-list {
+            min-height: 60px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item-info span {
+            display: block;
+        }
+
+        .cart-item-price {
+            font-weight: bold;
+            color: #1dd1a1;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font: bold 22px 'Space Grotesk', sans-serif;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-checkout {
+            width: 100%;
+            background-color: #1dd1a1;
+            color: #100F1A;
+            border: none;
+            padding: 15px 0;
+            border-radius: 12px;
+            font: bold 18px 'Space Grotesk', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+
+        .btn-checkout:hover:not(:disabled) {
+            background-color: #15b88c;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(29, 209, 161, 0.4);
+        }
+
+        .btn-checkout:disabled {
+            background-color: #464555;
+            color: #C7C4D8;
+            cursor: not-allowed;
+        }
+        /* ----- PHẦN MÃ GIẢM GIÁ VÀ TỔNG KẾT ----- */
+        .voucher-section {
+            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .voucher-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .voucher-input-group input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .voucher-input-group input:focus {
+            border-color: #7CCDFF;
+        }
+
+        .voucher-input-group button {
+            background: #464555;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font: bold 14px 'Space Grotesk', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .voucher-input-group button:hover {
+            background: #7CCDFF;
+            color: #100F1A;
+        }
+
+        .voucher-msg {
+            font-size: 13px;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+
+        .cart-summary-lines {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            color: #C7C4D8;
+            font-size: 15px;
+        }
+
+        .discount-line {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo" style="cursor: pointer;" onclick="window.location.href='../Dashboard.html'">
+            <img alt="logo" src="../../../img/LOGO.png">
+            <div class="logo_text">NOVA ENTRY</div>
+        </div>
+        <div class="features">
+            <div class="search-bar">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Tìm kiếm sự kiện...">
+            </div>
+            <a href="#">Tạo sự kiện</a>
+            <a href="MyTickets.html">Vé của tôi</a>
+        </div>
+        <div class="login-container" id="auth-container"></div>
+    </div>
+
+    <!-- BOOKING SECTION -->
+    <div class="booking-container">
+        <!-- Cột Trái: Sơ đồ -->
+        <div class="seat-map-section">
+            <div class="stage">STAGE</div>
+
+            <div class="seat-legend">
+                <div class="legend-item"><div class="seat available"></div> Trống</div>
+                <div class="legend-item"><div class="seat selected" style="color:transparent!important;"></div> Đang chọn</div>
+                <div class="legend-item"><div class="seat sold"></div> Đã bán/Đang giữ</div>
+            </div>
+
+            <div id="zones-container" style="width: 100%;">
+                <div style="text-align: center; color: #C7C4D8;">Đang tải sơ đồ rạp...</div>
+            </div>
+        </div>
+
+        <!-- Cột Phải: Giỏ hàng -->
+        <div class="cart-section">
+            <h2>Giỏ Hàng</h2>
+
+            <div class="event-summary" id="event-summary">
+                <h4 id="cart-ev-title">Đang tải...</h4>
+                <p id="cart-ev-time">--/--/----</p>
+            </div>
+
+            <div class="selected-seats-list" id="cart-items">
+                <p style="color: #6c757d; text-align: center; font-style: italic; margin-top: 15px;">Chưa có ghế nào được chọn.</p>
+            </div>
+
+            <div class="voucher-section">
+                <div class="voucher-input-group">
+                    <input type="text" id="voucher-code" placeholder="Nhập mã giảm giá (VD: WELCOME50)...">
+                    <button id="btn-apply-voucher">Áp dụng</button>
+                </div>
+                <p id="voucher-msg" class="voucher-msg"></p>
+            </div>
+
+            <div class="cart-summary-lines">
+                <div class="summary-line">
+                    <span>Tạm tính:</span>
+                    <span id="cart-subtotal">0 đ</span>
+                </div>
+                <div class="summary-line discount-line" id="discount-line" style="display: none;">
+                    <span>Giảm giá:</span>
+                    <span id="cart-discount">-0 đ</span>
+                </div>
+            </div>
+
+            <div class="cart-total">
+                <span>Tổng thanh toán:</span>
+                <span id="cart-total-price" style="color: #1dd1a1;">0 đ</span>
+            </div>
+
+            <button class="btn-checkout" id="btn-checkout" disabled>
+                Thanh toán ngay
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="footer_bottom" style="border: none;">
+            <p>&copy; 2026 NovaEntry. Đã đăng ký bản quyền.</p>
+        </div>
+    </div>
+
+    <script defer src="Booking.js"></script>
+</body>
+</html>

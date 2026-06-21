@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Ticket Management System - Web Layout</title>
+    <link rel="stylesheet" href="Admin.css">
+    <link rel="stylesheet" href="TableComponent.css">
+
+</head>
+<body>
+    <div class="admin">
+        <div class="sidebar">
+            <div class="logo">NOVA ENTRY</div>
+            <div class="thanh"></div>
+            <ul class="nav-menu"></ul>
+
+            <div class="sidebar-clock">
+                <div id="clock-time">00:00:00</div>
+                <div id="clock-date">Thứ..., --/--/----</div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="top-bar">
+                <div class="top-tabs"> </div>
+
+                <div class="user-profile">
+                    <div class="avatar-wrapper" id="avatar-btn">
+                        <span id="header-user-name">Đang tải...</span>
+                        <img id="header-avatar-img" src="" alt="Avatar">
+                    </div>
+                    <div class="profile-dropdown" id="profile-dropdown">
+                        <div class="profile-header">
+                            <b id="dropdown-name">Đang tải...</b>
+                            <small id="dropdown-role">...</small>
+                        </div>
+                        <ul class="profile-menu">
+                            <li>⚙️ Cài đặt tài khoản</li>
+                            <li id="logout-btn" class="logout">🚪 Đăng xuất</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="content-area"> </div>
+        </div>
+    </div>
+
+     <script src="SearchComponent.js"></script>
+    <script src="../PaginationComponent.js"></script>
+    <script src="../ToastComponent.js"></script>
+    <script src="ConfirmModal.js"></script> ```
+    <script src="Admin.js" defer></script>
+</body>
+</html>
